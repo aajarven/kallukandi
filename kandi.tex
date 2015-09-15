@@ -71,15 +71,15 @@
 % The following commands define the information used to generate title and
 % abstract pages. The following entries should be always specified:
 
-\title{Esimerkkiotsikko}
-\author{Eija Esimerkki}
+\title{Monte Carlo -menetelmä ja pelitekoälyt}
+\author{Kalle Viiri}
 \date{\today}
-\level{Seminaariraportti}
+\level{Referaatti}
 \abstract{Tiivistelmä.}
 
 % The following can be used to specify keywords and classification of the paper:
 
-\keywords{avainsana 1, avainsana 2, avainsana 3}
+\keywords{Monte Carlo, puuhaku, tekoäly}
 
 % classification according to ACM Computing Classification System (http://www.acm.org/about/class/)
 % This is probably mostly relevant for computer scientists
@@ -122,11 +122,17 @@
 
 \mainmatter       % clear page, start arabic page numbering
 
-\section{Esimerkkiluku}
+\section{Puuhaku pelitekoälyn pohjana}
 
-% Write some science here.
+Monet ihmisten pelaamista peleistä, esimerkiksi \textit{shakki} ja \textit{go}, ovat helppoja mallintaa pelipuina. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmusta voi saavuttaa. Pelin juurisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä on helppo käsitellä tavallisilla puuhakualgoritmeilla.~\cite{aima}
 
-Esimerkkilause ja lähdeviite~\cite{esimerkki}.
+Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
+
+\textit{Minimax}-haun ongelmana on se, että vain puun juurisolmujen arvo pelaajille on tiedossa. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa juurisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa on haku katkaistava ja käytettävä heuristiikkaa eli arviota katkaistun oksan todellisesta arvosta pelaajille.~\cite{aima}
+
+
+\section{Monte Carlo kohtaa pelipuut}
+
 
 
 % --- References ---
