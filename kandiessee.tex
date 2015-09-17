@@ -2,7 +2,7 @@
 % 
 % last updated 2013/02/15 for tkltiki2 v1.02
 
-\documentclass[finnish]{tktltiki2}
+\documentclass[12pt,finnish]{tktltiki2}
 
 % tktltiki2 automatically loads babel, so you can simply
 % give the language parameter (e.g. finnish, swedish, english, british) as
@@ -49,6 +49,10 @@
 \usepackage[nottoc]{tocbibind}
 % tocbibind renames the bibliography, use the following to change it back
 \settocbibname{Lähteet}
+
+% spacing
+\usepackage{setspace}
+\onehalfspacing
 
 % --- Theorem environment definitions ---
 
@@ -122,18 +126,34 @@
 
 \mainmatter       % clear page, start arabic page numbering
 
-\section{Puuhaku pelitekoälyn pohjana}
+\section{Peliteoria ja pelipuu}
 
-Monet ihmisten pelaamista peleistä, esimerkiksi \textit{shakki} ja \textit{go}, ovat helppoja mallintaa pelipuina. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmusta voi saavuttaa. Pelin juurisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä on helppo käsitellä tavallisilla puuhakualgoritmeilla.~\cite{aima}
+Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista. Peli on kombinatorinen, kun se täyttää seuraavat ehdot:~\citep{browne}
 
-Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
+\begin{itemize}
+	\item nollasummaisuus, eli kaikkien mahdollisten lopputulosten arvo pelaajille on yhteensä nolla. Tämä tarkoittaa, että yhden pelaajan saadessa paremman lopputuloksen muiden pelaajien lopputulos huononee.
+	 \item täydellinen informaatio, eli tarkka pelitilanne on jatkuvasti kaikkien pelaajien tiedossa.
+	 \item determinismi, eli määräytyykö pelin tulos osittain tai kokonaan satunnaistekijöiden mukaan.
+	 \item vuorottainen, eli pelaajat valitsevat ja suorittavat toimintansa vuoroittain.
+	 \item diskreetti, eli peliä pelataan erillisissä vuoroissa reaaliaikaisuuden sijaan.
+\end{itemize}
 
-\textit{Minimax}-haun ongelmana on se, että vain puun juurisolmujen arvo pelaajille on tiedossa. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa juurisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa on haku katkaistava ja käytettävä heuristiikkaa eli arviota katkaistun oksan todellisesta arvosta pelaajille.~\cite{aima}
+Esimerkkejä kombinatorisista peleistä ovat \textit{shakki} ja \textit{go}. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu todella syvällistä ja monimutkaista strategiaa.~\citep{browne}
+
+Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmusta voi saavuttaa. Pelin lehtisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä on helppo käsitellä tavallisilla puuhakualgoritmeilla.~\citep{aima}
+
+Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\citep{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
+
+\textit{Minimax}-haun ongelmana on se, että vain puun juurisolmujen arvo pelaajille on tiedossa. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa juurisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa on haku katkaistava ja käytettävä heuristiikkaa eli arviota katkaistun oksan todellisesta arvosta pelaajille.~\citep{aima}
 
 
-\section{Monte Carlo kohtaa pelipuut}
+\section{Monte Carlo -menetelmä pelipuun käsittelyssä}
 
+Monte Carlo -puuhaussa (\textit{Monte Carlo Tree Search}, jatkossa \textbf{MCTS}) pelipuuta laajennetaan etenevästi, ja käsitellään leveyssuuntaisen etsinnän sijaan simuloimalla satunnaisilla siirroilla tilanteesta pelin etenemistä loppuun saakka. Menetelmän perusajatus on, että tarpeeksi suurella satunnaisotoksella voidaan arvioida kunkin siirron todellista hyötyä pelaajalle.~\cite{browne}
 
+Menetelmässä puuta käsitellään etsimällä pelipuusta solmu, jolla on tutkimattomia lapsia. Lapset liitetään pelipuuhun, ja samassa yhteydessä pelataan satunnaisilla siirroilla peli uudesta lapsitilasta loppuun saakka. Pelin lopputilanteen arvo pelaajalle palautetaan pelipuussa takaisin juureen. Jokainen reitillä oleva solmu ylläpitää tietoa jälkeläistensä simulaatiopelien tulosten keskiarvosta ja lukumäärästä.~\cite{browne}
+
+MCTS valitsee siirron, kun haun laskenta-aika on kulutettu loppuun tai haku halutaan keskeyttää muusta syystä. Tämän jälkeen on vielä valittava, mikä siirto lopuksi valitaan. Eri malleja 
 
 % --- References ---
 %
