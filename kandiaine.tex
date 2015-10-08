@@ -1,0 +1,215 @@
+% --- Template for thesis / report with tktltiki2 class ---
+% 
+% last updated 2013/02/15 for tkltiki2 v1.02
+
+\documentclass[12pt,finnish]{tktltiki2}
+
+% tktltiki2 automatically loads babel, so you can simply
+% give the language parameter (e.g. finnish, swedish, english, british) as
+% a parameter for the class: \documentclass[finnish]{tktltiki2}.
+% The information on title and abstract is generated automatically depending on
+% the language, see below if you need to change any of these manually.
+% 
+% Class options:
+% - grading                 -- Print labels for grading information on the front page.
+% - disablelastpagecounter  -- Disables the automatic generation of page number information
+%                              in the abstract. See also \numberofpagesinformation{} command below.
+%
+% The class also respects the following options of article class:
+%   10pt, 11pt, 12pt, final, draft, oneside, twoside,
+%   openright, openany, onecolumn, twocolumn, leqno, fleqn
+%
+% The default font size is 11pt. The paper size used is A4, other sizes are not supported.
+%
+% rubber: module pdftex
+
+% --- General packages ---
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsfonts,amsmath,amssymb,amsthm,booktabs,color,enumitem,graphicx}
+\usepackage[pdftex,hidelinks]{hyperref}
+
+% Automatically set the PDF metadata fields
+\makeatletter
+\AtBeginDocument{\hypersetup{pdftitle = {\@title}, pdfauthor = {\@author}}}
+\makeatother
+
+% --- Language-related settings ---
+%
+% these should be modified according to your language
+
+% babelbib for non-english bibliography using bibtex
+\usepackage[fixlanguage]{babelbib}
+\selectbiblanguage{finnish}
+
+% add bibliography to the table of contents
+\usepackage[nottoc]{tocbibind}
+% tocbibind renames the bibliography, use the following to change it back
+\settocbibname{Lähteet}
+
+% spacing
+\usepackage{setspace}
+\onehalfspacing
+
+% enumitem
+\usepackage{enumitem}
+
+% algorithm snippets
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% --- Theorem environment definitions ---
+
+\newtheorem{lau}{Lause}
+\newtheorem{lem}[lau]{Lemma}
+\newtheorem{kor}[lau]{Korollaari}
+
+\theoremstyle{definition}
+\newtheorem{maar}[lau]{Määritelmä}
+\newtheorem{ong}{Ongelma}
+\newtheorem{alg}[lau]{Algoritmi}
+\newtheorem{esim}[lau]{Esimerkki}
+
+\theoremstyle{remark}
+\newtheorem*{huom}{Huomautus}
+
+
+% --- tktltiki2 options ---
+%
+% The following commands define the information used to generate title and
+% abstract pages. The following entries should be always specified:
+
+\title{Monte Carlo -menetelmä ja pelitekoälyt}
+\author{Kalle Viiri}
+\date{\today}
+\level{Aine}
+\abstract{}
+
+% The following can be used to specify keywords and classification of the paper:
+
+\keywords{Monte Carlo, puuhaku, tekoäly}
+
+% classification according to ACM Computing Classification System (http://www.acm.org/about/class/)
+% This is probably mostly relevant for computer scientists
+% uncomment the following; contents of \classification will be printed under the abstract with a title
+% "ACM Computing Classification System (CCS):"
+% \classification{}
+
+% If the automatic page number counting is not working as desired in your case,
+% uncomment the following to manually set the number of pages displayed in the abstract page:
+%
+% \numberofpagesinformation{16 sivua + 10 sivua liitteissä}
+%
+% If you are not a computer scientist, you will want to uncomment the following by hand and specify
+% your department, faculty and subject by hand:
+%
+% \faculty{Matemaattis-luonnontieteellinen}
+% \department{Tietojenkäsittelytieteen laitos}
+% \subject{Tietojenkäsittelytiede}
+%
+% If you are not from the University of Helsinki, then you will most likely want to set these also:
+%
+% \university{Helsingin Yliopisto}
+% \universitylong{HELSINGIN YLIOPISTO --- HELSINGFORS UNIVERSITET --- UNIVERSITY OF HELSINKI} % displayed on the top of the abstract page
+% \city{Helsinki}
+%
+
+
+\begin{document}
+
+% --- Front matter ---
+
+\frontmatter      % roman page numbering for front matter
+
+\maketitle        % title page
+\makeabstract     % abstract page
+
+\tableofcontents  % table of contents
+
+% --- Main matter ---
+
+\mainmatter       % clear page, start arabic page numbering
+
+\section{Peliteoria ja pelipuu}
+
+Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista. Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{browne}:
+
+\begin{enumerate}[label=\roman*.]
+	\item Nollasummaisuus, eli kaikkien mahdollisten lopputulosten arvo pelaajille on yhteensä nolla. Tämä tarkoittaa, että yhden pelaajan saadessa paremman lopputuloksen muiden pelaajien lopputulos huononee.
+	 \item Täydellinen informaatio, eli tarkka pelitilanne on jatkuvasti kaikkien pelaajien tiedossa.
+	 \item Determinismi, eli peliin ei sisälly satunnaistekijöitä.
+	 \item Vuorottainen, eli pelaaja voi toiminnallaan vaikuttaa pelitilanteeseen vain määrätyillä vuoroillaan.
+	 \item Diskreetti, eli peliä pelataan erillisissä vuoroissa reaaliaikaisuuden sijaan.
+\end{enumerate}
+
+Esimerkkejä kombinatorisista peleistä ovat \textit{shakki} ja \textit{go}. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu kuitenkin edistynyttä strategiaa~\cite{browne}.
+
+Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmun kuvaamasta pelitilanteesta voi saavuttaa. Pelin lehtisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä voi käsitellä tavallisilla puuhakualgoritmeilla, kuten leveyssuuntaisella haulla~\cite{aima}.
+
+Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
+
+\textit{Minimax}-haun ongelmana on se, että vain puun juurisolmujen arvo pelaajille on tiedossa. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa juurisolmuihin asti~\cite{aima}. Jotta seuraava siirto saataisiin valittua järkevässä ajassa on haku katkaistava ennen lopputilannetta ja käytettävä arviota keskeneräisen pelin edullisuudesta pelaajille eli heuristiikkaa~\cite{aima}.
+
+Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
+
+
+\section{Monte Carlo -puuhaku}
+
+Monte Carlo -puuhaun (\textit{Monte Carlo Tree Search}, jatkossa MCTS) perusajatus on korvata perinteisessä pelipuuhaussa käytettävä heuristiikka satunnaisella simulaatiolla. MCTS-haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan iteratiivisesti etsimällä juuresta alkaen siirtoja jotka johtavat uusiin pelitilanteisiin liitettäväksi puuhun~\cite{browne}.
+
+Laajennettavasta solmusta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$ (yleensä $1$ voitosta, $-1$ tappiosta ja $0$ tasapelistä). Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien tilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
+
+Browne ym. esittelee yleistetyn MCTS:n seuraavalla algoritmilla:~\cite{browne}
+\begin{algorithm}[H]
+\caption{Yleistetty MCTS}
+\begin{algorithmic}[1]
+\Function{MctsHaku}{$s_0$}
+	\State luo pelipuun juuri $v_0$ pelitilanteesta $s_0$
+	\While{laskenta-aikaa on jäljellä}
+		\State $v_1 \leftarrow$ \Call{Laajenna}{$v_0$}
+		\State $\Delta \leftarrow$ \Call{Simuloi}{$s(v_1)$}
+		\State \Call{Vastavirta}{$v_1$, $\Delta$}
+	\EndWhile
+	\State \Return siirto(\Call{BestChild}{$v_0$})
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes se katkaistaan ulkopuolelta. Haun päätyttyä valitaan siirto, joka katsotaan parhaaksi haun aloitustilanteesta suoritettujen simulaatioiden perusteella. Suoritettavan siirron valintaan mahdollisista siirroista on useita malleja. Voidaan esimerkiksi valita siirto, josta seuraavan tilan odotusarvo on korkein, tai siirto, josta on suoritettu eniten simulointeja ja jonka odotusarvo on siksi todennäköisesti lähimpänä sen todellista arvoa~\cite{browne}.
+
+
+\section{Erityisiä hyötyjä}
+
+MCTS on algoritmina erittäin helppo soveltaa monenlaisiin ongelmiin. Koska se ei tarvitse heuristiikkaa, tekoälyn ohjelmoijan ei tarvitse tietää pohjalla olevasta pelistä muuta kuin perussäännöt~\cite{browne}. Heuristiikan liittämisellä pelitilanteiden arviointiin voidaan kuitenkin saavuttaa parempia tuloksia myös MCTS:n kanssa~\cite{browne}.
+
+MCTS ylläpitää arviota siirtojen kannattavuudesta reaaliaikaisesti~\cite{browne}. Haun voi siis keskeyttää koska tahansa ja saada silti kelvollisen ratkaisun. Pidemmän laskenta-ajan antaminen MCTS:lle parantaa kuitenkin tuloksen laatua, sillä algoritmilla on enemmän aikaa suorittaa simulaatioita ja siten etsiä parempia toimintamalleja~\cite{browne}. Ajankäyttö on myös tehokasta, sillä puuta voi laajentaa epätasaisesti painottaen lupaavia solmuja~\cite{browne}. 
+
+
+% --- References ---
+%
+% bibtex is used to generate the bibliography. The babplain style
+% will generate numeric references (e.g. [1]) appropriate for theoretical
+% computer science. If you need alphanumeric references (e.g [Tur90]), use
+%
+% \bibliographystyle{babalpha-lf}
+%
+% instead.
+
+\bibliographystyle{babplain-lf}
+\bibliography{lahteet}
+
+
+% --- Appendices ---
+
+% uncomment the following
+
+% \newpage
+% \appendix
+% 
+% \section{Esimerkkiliite}
+
+\end{document}
+
