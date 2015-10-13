@@ -60,6 +60,14 @@
 % algorithm snippets
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{caption}
+
+% copy paste from http://tex.stackexchange.com/questions/33866/algorithm-tag-and-page-break
+\DeclareCaptionFormat{algor}{%
+  \hrulefill\par\offinterlineskip\vskip1pt%
+    \textbf{#1#2}#3\offinterlineskip\hrulefill}
+\DeclareCaptionStyle{algori}{singlelinecheck=off,format=algor,labelsep=space}
+\captionsetup[algorithm]{style=algori}
 
 % --- Theorem environment definitions ---
 
@@ -135,10 +143,14 @@
 
 \section{Johdanto}
 
-Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista. Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{browne}:
+Pelillä~\cite{browne} tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista. Mahdollisten pelitilanteiden joukkoa merkataan $S$. Pelillä on alkutila $s_0 \in S$ ja joukko lopputiloja $S_T \subseteq S$. Mahdollisten siirtojen joukkoa merkitään $A$, ja tilasiirtymäfunktio $f : S \times A \rightarrow S$ määrittää, mihin tilaan päädytään lähtötilasta milläkin siirrolla.
+
+Pelin lopputuloksen edullisuus pelaajalle määritellään palkintofunktiolla $R : S \rightarrow \mathbb{R}$. Usein käytetty palkintofunktio on arvoltaan $0$ pelitilanteissa jotka eivät ole lopputilanteita, ja lopputilanteille $1$ voittavista tilanteista, $0$ tasapeleistä ja $-1$ häviöistä.
+
+Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{browne}:
 
 \begin{enumerate}[label=\roman*.]
-	\item Nollasummaisuus, eli kaikkien mahdollisten lopputulosten arvo pelaajille on yhteensä nolla. Tämä tarkoittaa, että yhden pelaajan saadessa paremman lopputuloksen muiden pelaajien lopputulos huononee.
+	\item Nollasummaisuus, eli jokaisessa tilassa pelaajien palkintofunktioiden summa on nolla. Tämä tarkoittaa, että yhden pelaajan parantaessa tulostaan toisen pelaajan tulos heikkenee.
 	 \item Täydellinen informaatio, eli tarkka pelitilanne on jatkuvasti kaikkien pelaajien tiedossa.
 	 \item Determinismi, eli peliin ei sisälly satunnaistekijöitä.
 	 \item Vuorottainen, eli pelaaja voi toiminnallaan vaikuttaa pelitilanteeseen vain määrätyillä vuoroillaan.
@@ -147,9 +159,9 @@ Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vai
 
 Esimerkkejä kombinatorisista peleistä ovat \textit{shakki} ja \textit{go}. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu kuitenkin edistynyttä strategiaa~\cite{browne}.
 
-Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmun kuvaamasta pelitilanteesta voi saavuttaa. Pelin lehtisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä voi käsitellä tavallisilla puuhakualgoritmeilla, kuten leveyssuuntaisella haulla~\cite{aima}.
+Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmun kuvaamasta pelitilanteesta voi saavuttaa. Pelipuun lehtisolmut ovat lopputilanteita, joissa pelin lopputulos tyypillisesti määräytyy. Pelipuuna mallinnettua peliä voi käsitellä tavallisilla puuhakualgoritmeilla, kuten leveyssuuntaisella haulla~\cite{aima}.
 
-\subsection{Heuristiikka}
+\subsection{Minimax ja heuristiikka}
 
 Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
 
@@ -162,12 +174,13 @@ Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukum�
 
 Monte Carlo -puuhaun (\textit{Monte Carlo Tree Search}, jatkossa MCTS) perusajatus on korvata perinteisessä pelipuuhaussa käytettävä heuristiikka satunnaisella simulaatiolla. Haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan iteratiivisesti etsimällä juuresta alkaen siirtoja jotka johtavat uusiin pelitilanteisiin liitettäväksi puuhun~\cite{browne}.
 
-Laajennettavasta solmusta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$ (yleensä $1$ voitosta, $-1$ tappiosta ja $0$ tasapelistä). Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien tilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
+Laajennettavasta solmusta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$ (yleensä $1$ voitosta, $-1$ tappiosta ja $0$ tasapelistä). Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien pelitilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
 
 Browne ym. esittelee yleistetyn MCTS:n seuraavalla algoritmilla:~\cite{browne}
 \begin{algorithm}[H]
 \caption{Yleistetty MCTS}
-\begin{algorithmic}[1]
+\label{MCTS}
+\begin{algorithmic}[0]
 \Function{MctsHaku}{$s_0$}
 	\State luo pelipuun juuri $v_0$ pelitilanteesta $s_0$
 	\While{laskenta-aikaa on jäljellä}
@@ -175,16 +188,18 @@ Browne ym. esittelee yleistetyn MCTS:n seuraavalla algoritmilla:~\cite{browne}
 		\State $\Delta \leftarrow$ \Call{Simuloi}{$s(v_1)$}
 		\State \Call{Vastavirta}{$v_1$, $\Delta$}
 	\EndWhile
-	\State \Return siirto(\Call{BestChild}{$v_0$})
+	\State \Return siirto(\Call{ParasLapsi}{$v_0$})
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
+Algoritmissa \ref{MCTS} esiteltyjen aliohjelmien \textsc{ValitseLapsi}, \textsc{Simuloi}, \textsc{Vastavirta} ja \textsc{ParasLapsi} toiminta on toteutusriippuvaista.
 
 Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes se katkaistaan ulkopuolelta. Haun päätyttyä valitaan siirto, joka katsotaan parhaaksi haun aloitustilanteesta suoritettujen simulaatioiden perusteella. Suoritettavan siirron valintaan mahdollisista siirroista on useita malleja. Voidaan esimerkiksi valita siirto, josta seuraavan tilan odotusarvo on korkein, tai siirto, josta on suoritettu eniten simulointeja ja jonka odotusarvo on siksi todennäköisesti lähimpänä sen todellista arvoa~\cite{browne}.
 
 \section{UCT-menetelmä}
 
-\textit{Upper Confidence Bounds for Trees}~\cite{browne} (jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. Laajentaessaan pelipuuta UCT pyrkii tasapainottelemaan hyväksi epäiltyjen pelitilanteiden lisätutkimuksen ja toistaiseksi vähän tutkittujen pelitilanteiden simuloinnin välillä.
+\textit{Upper Confidence Bounds for Trees}~\cite{browne, kocsis} (jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. Laajentaessaan pelipuuta UCT pyrkii tasapainottelemaan hyväksi epäiltyjen pelitilanteiden lisätutkimuksen ja toistaiseksi vähän tutkittujen pelitilanteiden simuloinnin välillä.
 
 UCT mallintaa mahdollisesti laajennettavien lapsisolmujen arvot satunnaismuuttujina, joiden jakauma on tuntematon. Laajennettava lapsisolmu $j$ valitaan maksimoimaan seuraavan lausekkeen arvo:
 \begin{equation}
@@ -194,19 +209,10 @@ UCT mallintaa mahdollisesti laajennettavien lapsisolmujen arvot satunnaismuuttuj
 missä $n$ on laajennettavan solmun vanhemman vierailuluku, $n_j$ on laajennettavan lapsisolmun vierailuluku, $C_p > 0$ on vakio ja $X_j$ on odotusarvo eli $j$:n läpi kulkeneiden $\Delta$-arvojen keskiarvo tähän asti suoritetuilla simulaatioilla. Tässä kontekstissa nollalla jaon, joka seuraa kun $n_j = 0$, tuloksen katsotaan olevan ääretön. Näin solmut joissa ei ole vierailtu vielä kertaakaan tarkastetaan aina ensin, ja muulloin painotetaan solmuja joilla on hyvä odotusarvo.
 
 Browne ym. esittelee UCT:n seuraavalla algoritmilla:~\cite{browne}
-\begin{algorithm}[H]
-\caption{Upper Confidence Bounds for Trees}
-\begin{algorithmic}[1]
-\Function{UctHaku}{$s_0$}
-	\State luo pelipuun juuri $v_0$ pelitilanteesta $s_0$
-	\While{laskenta-aikaa on jäljellä}
-		\State $v_1 \leftarrow$ \Call{ValitseLapsi}{$v_0$}
-		\State $\Delta \leftarrow$ \Call{Simuloi}{$s(v_1)$}
-		\State \Call{Vastavirta}{$v_1$, $\Delta$}
-	\EndWhile
-	\State \Return siirto(\Call{BestChild}{$v_0$})
-\EndFunction
-\\
+\begin{center}
+\captionof{algorithm}{Upper Confidence Bounds for Trees}
+\begin{algorithmic}[0]
+\begin{samepage}
 \Function{ValitseLapsi}{$v$}
 	\While{$v$ ei ole lehti}
 		\If{$v$:llä on puuhun lisäämättömiä lapsia}	
@@ -216,18 +222,42 @@ Browne ym. esittelee UCT:n seuraavalla algoritmilla:~\cite{browne}
 		\EndIf
 	\EndWhile
 \EndFunction
+\end{samepage}
 \\
-\Function{Laajenna}{$v$}
-	\State valitaan siirto $a$ pelitilan $v$ kokeilemattomista siirroista
-	\State lisää $v$:lle lapsi $v'$ joka vastaa siirtoa $a$ tilasta $v$
+\begin{samepage}
+\Function{ParasLapsi}{$v, c$}
+	\State \Return $v$:n lapsi jolla on suurin $\frac{Q(v')}{N(v')} + c\sqrt{\frac{2 \ln N(v)}{N(v')}}$
 \EndFunction
+\end{samepage}
+\\
+\begin{samepage}
+\Function{Simuloi}{$s$}
+	\While{$s$ ei ole pelin lopputilanne}
+		\State valitse $a \in A(s)$ satunnaisesti tasaisella jakaumalla
+		\State $s \leftarrow f(s, a)$
+	\EndWhile
+	\State \Return $R(s)$ 
+\EndFunction
+\end{samepage}
+\\
+\begin{samepage}
+\Function{Vastavirta}{$v, \Delta$}
+	\While{$v$ ei ole \textit{null}}
+		\State $N(v) \leftarrow N(v) + 1$
+		\State $Q(v) \leftarrow Q(v) + \Delta(v, p)$
+		\State $v \leftarrow v$:n vanhempi
+	\EndWhile
+\EndFunction
+\end{samepage}
 \end{algorithmic}
-\end{algorithm}
+\end{center}
+
+Missä $s(v)$ on solmun $v$ kuvaama pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä. $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$.
 
 
 \section{Erityisiä hyötyjä}
 
-MCTS on algoritmina erittäin helppo soveltaa monenlaisiin ongelmiin. Koska se ei tarvitse heuristiikkaa, tekoälyn ohjelmoijan ei tarvitse tietää pohjalla olevasta pelistä muuta kuin perussäännöt~\cite{browne}. Heuristiikan liittämisellä pelitilanteiden arviointiin voidaan kuitenkin saavuttaa parempia tuloksia myös MCTS:n kanssa~\cite{browne}.
+MCTS:n vahvuus on sen helppo sovellettavuus erilaisiin ongelmiin~\cite{browne}. Koska se ei tarvitse heuristiikkaa, tekoälyn ohjelmoijan ei tarvitse tietää pohjalla olevasta pelistä muuta kuin perussäännöt. Heuristiikan liittämisellä pelitilanteiden arviointiin voidaan kuitenkin saavuttaa parempia tuloksia myös MCTS:n kanssa.%TODO: Alkuperäinen cite%
 
 MCTS ylläpitää arviota siirtojen kannattavuudesta reaaliaikaisesti~\cite{browne}. Haun voi siis keskeyttää koska tahansa ja saada silti kelvollisen ratkaisun. Pidemmän laskenta-ajan antaminen MCTS:lle parantaa kuitenkin tuloksen laatua, sillä algoritmilla on enemmän aikaa suorittaa simulaatioita ja siten etsiä parempia toimintamalleja~\cite{browne}. Ajankäyttö on myös tehokasta, sillä puuta voi laajentaa epätasaisesti painottaen lupaavia solmuja~\cite{browne}. 
 
