@@ -61,6 +61,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{caption}
+\floatname{algorithm}{Algoritmi}
 
 % copy paste from http://tex.stackexchange.com/questions/33866/algorithm-tag-and-page-break
 \DeclareCaptionFormat{algor}{%
@@ -127,7 +128,6 @@
 
 
 \begin{document}
-
 % --- Front matter ---
 
 \frontmatter      % roman page numbering for front matter
@@ -145,7 +145,7 @@
 
 Pelillä~\cite{browne} tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista. Mahdollisten pelitilanteiden joukkoa merkataan $S$. Pelillä on alkutila $s_0 \in S$ ja joukko lopputiloja $S_T \subseteq S$. Mahdollisten siirtojen joukkoa merkitään $A$, ja tilasiirtymäfunktio $f : S \times A \rightarrow S$ määrittää, mihin tilaan päädytään lähtötilasta milläkin siirrolla.
 
-Pelin lopputuloksen edullisuus pelaajalle määritellään palkintofunktiolla $R : S \rightarrow \mathbb{R}$. Usein käytetty palkintofunktio on arvoltaan $0$ pelitilanteissa jotka eivät ole lopputilanteita, ja lopputilanteille $1$ voittavista tilanteista, $0$ tasapeleistä ja $-1$ häviöistä.
+Pelin lopputuloksen edullisuus pelaajalle määritellään palkintofunktiolla $R : S \rightarrow \mathbb{R}$. Tässä tekstissä käytetään usein käytettyä palkintofunktiota, joka on arvoltaan $0$ pelitilanteissa jotka eivät ole lopputilanteita, ja lopputilanteille $1$ voittavista tilanteista, $0$ tasapeleistä ja $-1$ häviöistä.
 
 Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{browne}:
 
@@ -157,7 +157,7 @@ Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{
 	 \item Diskreetti, eli peliä pelataan erillisissä vuoroissa reaaliaikaisuuden sijaan.
 \end{enumerate}
 
-Esimerkkejä kombinatorisista peleistä ovat \textit{shakki} ja \textit{go}. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu kuitenkin edistynyttä strategiaa~\cite{browne}.
+Esimerkkejä kombinatorisista peleistä ovat shakki ja go. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu kuitenkin edistynyttä strategiaa~\cite{browne}.
 
 Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmun kuvaamasta pelitilanteesta voi saavuttaa. Pelipuun lehtisolmut ovat lopputilanteita, joissa pelin lopputulos tyypillisesti määräytyy. Pelipuuna mallinnettua peliä voi käsitellä tavallisilla puuhakualgoritmeilla, kuten leveyssuuntaisella haulla~\cite{aima}.
 
@@ -165,16 +165,18 @@ Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pel
 
 Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
 
-\textit{Minimax}-haun ongelmana on se, että vain puun juurisolmujen arvo pelaajille on tiedossa~\cite{aima}. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa juurisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa on haku katkaistava ennen lopputilannetta ja käytettävä arviota keskeneräisen pelin edullisuudesta pelaajille eli heuristiikkaa.
+\textit{Minimax}-haun ongelmana on se, että vain puun juurisolmujen arvo pelaajille on tiedossa~\cite{aima}. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa juurisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa on haku katkaistava ennen pelin lopputilanteisiin pääsemistä. Koska haku ei välttämättä pääse pelin lopputilanteisiin saakka, tarvitsee haku keinon arvioida keskeneräisiä pelitilanteita kuin ne olisivat lopputilanteita.
 
-Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
+Keskeneräisen pelitilanteen perusteella voidaan laskea arvio sen edullisuudesta pelaajalle. Tällaisen arvion muodostavaa funktiota kutsutaan heuristiikaksi. Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
 
 
 \section{Monte Carlo -puuhaku}
 
-Monte Carlo -puuhaun (\textit{Monte Carlo Tree Search}, jatkossa MCTS) perusajatus on korvata perinteisessä pelipuuhaussa käytettävä heuristiikka satunnaisella simulaatiolla. Haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan iteratiivisesti etsimällä juuresta alkaen siirtoja jotka johtavat uusiin pelitilanteisiin liitettäväksi puuhun~\cite{browne}.
+Monte Carlo -puuhaku~\cite{browne}(\textit{Monte Carlo Tree Search}, jatkossa MCTS) on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Perusajatuksena on, että toistamalla simulaatioita ja tarkastelemalla lopputuloksia saadaan toimiva arvio pelitilanteen arvosta pelaajalle.
 
-Laajennettavasta solmusta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$ (yleensä $1$ voitosta, $-1$ tappiosta ja $0$ tasapelistä). Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien pelitilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
+Haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan iteratiivisesti etsimällä juuresta alkaen pelitilanteita, joita vastaavilla solmuilla on pelipuuhun liittymättömiä lapsia. Laajennettavan solmun valinta ei väistämättä tapahdu tasapuolisesti, vaan esimerkiksi haaroja, joista on saatu lupaavia tuloksia, voidaan laajentaa muita enemmän.
+
+Kun laajennettava solmu on valittu, puuhun liitetään sen uudeksi lapseksi jokin siitä seuraava pelitilanne. Tästä lapsesta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$. Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien pelitilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
 
 Browne ym. esittelee yleistetyn MCTS:n seuraavalla algoritmilla:~\cite{browne}
 \begin{algorithm}[H]
@@ -193,25 +195,48 @@ Browne ym. esittelee yleistetyn MCTS:n seuraavalla algoritmilla:~\cite{browne}
 \end{algorithmic}
 \end{algorithm}
 
-Algoritmissa \ref{MCTS} esiteltyjen aliohjelmien \textsc{ValitseLapsi}, \textsc{Simuloi}, \textsc{Vastavirta} ja \textsc{ParasLapsi} toiminta on toteutusriippuvaista.
+Algoritmissa \ref{MCTS} esiteltyjen aliohjelmien \textsc{ValitseLapsi}, \textsc{Simuloi}, \textsc{Vastavirta} ja \textsc{ParasLapsi} toiminta on jätetty kuvaamatta, sillä ne vaihtelevat erilaisten MCTS-toteutusten välillä.
 
-Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes se katkaistaan ulkopuolelta. Haun päätyttyä valitaan siirto, joka katsotaan parhaaksi haun aloitustilanteesta suoritettujen simulaatioiden perusteella. Suoritettavan siirron valintaan mahdollisista siirroista on useita malleja. Voidaan esimerkiksi valita siirto, josta seuraavan tilan odotusarvo on korkein, tai siirto, josta on suoritettu eniten simulointeja ja jonka odotusarvo on siksi todennäköisesti lähimpänä sen todellista arvoa~\cite{browne}.
+Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes suoritus katkaistaan ulkopuolelta. Haun päätyttyä valitaan siirto, joka katsotaan parhaaksi haun aloitustilanteesta suoritettujen simulaatioiden perusteella. Suoritettavan siirron valintaan mahdollisista siirroista on useita malleja~\cite{browne}. Voidaan esimerkiksi valita siirto, josta seuraavan tilan odotusarvo on korkein, tai siirto, josta on suoritettu eniten simulointeja ja jonka odotusarvo on siksi todennäköisesti lähimpänä sen todellista arvoa.
 
 \section{UCT-menetelmä}
 
-\textit{Upper Confidence Bounds for Trees}~\cite{browne, kocsis} (jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. Laajentaessaan pelipuuta UCT pyrkii tasapainottelemaan hyväksi epäiltyjen pelitilanteiden lisätutkimuksen ja toistaiseksi vähän tutkittujen pelitilanteiden simuloinnin välillä.
+\subsection{Monikätisen rosvon ongelma}
 
-UCT mallintaa mahdollisesti laajennettavien lapsisolmujen arvot satunnaismuuttujina, joiden jakauma on tuntematon. Laajennettava lapsisolmu $j$ valitaan maksimoimaan seuraavan lausekkeen arvo:
+Monikätisen rosvon optimointiongelmassa~\cite{browne} (\textit{bandit problem}) pelaajalla on peliautomaatti, jossa on $K$ vipua. Jokaiselle vivulle on määritelty pelaajalle tuntematon todennäköisyysjakauma, jonka mukaan pelaaja saa palkinnon vetäessään vipua. Ongelmana on löytää strategia, jolla minimoidaan pelkästään parasta vipua pelaavan strategian kokonaispalkinnon etumatka omaamme nähden.
+
+Tehokkaan pelistrategian löytäminen monikätisen rosvon ongelmaan edellyttää algoritmia, joka osaa pelata paljon vivuilla joista on jo saatu hyviä tuloksia. Samalla kuitenkin sen on tutkittava välillä muitakin vipuja, jotta mahdollisesti huomaamatta jääneet vivut voidaan hyödyntää. Tällaisen strategian esittelee Auer ym, jonka ylemmän luottamusrajan menetelmä~\cite{auer} (\textit{Upper Confidence Bounds}, jatkossa UCB1) valitsee pelattavaksi vivun joka maksimoi seuraavan lausekkeen
 \begin{equation}
-\overline{X}_j + 2C_p \sqrt{\frac{2 \ln n}{n_j}}
+UCB1 = \overline{X}_j + 2C_p \sqrt{\frac{2 \ln n}{n_j}}
 \end{equation}
+arvon, siten että $X_j$ on vivun $j$ tuottamien palkintojen keskiarvo, $n_j$ on vivun $j$ pelikertojen määrä tähän mennessä $n$ on koko pelikoneen pelikertojen määrä. Tasapelit ratkaistaan toteutuksissa tyypillisesti satunnaisesti, ja kun $n_j = 0$ katsotaan että $UCB1 = \inf$ eli kaikkia vipuja kokeillaan vähintään kerran ennen kuin yhtäkään pelataan toista kertaa~\cite{browne}.
 
-missä $n$ on laajennettavan solmun vanhemman vierailuluku, $n_j$ on laajennettavan lapsisolmun vierailuluku, $C_p > 0$ on vakio ja $X_j$ on odotusarvo eli $j$:n läpi kulkeneiden $\Delta$-arvojen keskiarvo tähän asti suoritetuilla simulaatioilla. Tässä kontekstissa nollalla jaon, joka seuraa kun $n_j = 0$, tuloksen katsotaan olevan ääretön. Näin solmut joissa ei ole vierailtu vielä kertaakaan tarkastetaan aina ensin, ja muulloin painotetaan solmuja joilla on hyvä odotusarvo.
+\subsection{Luottamusylärajat puuhaussa}
+
+Kocsis ym. esittelemä puuhakujen luottamusyläraja -menetelmä (\textit{Upper Confidence Bounds for Trees}~\cite{browne, kocsis} jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. UCT mallintaa pelipuuta laajentaessa solmun valinnan monikätisen rosvon ongelmana. Tällöin $X_j$ on solmun $j$ kautta suoritettujen simulaatioiden lopputulosten keskiarvo, $n_j$ solmun $j$ läpi suoritettujen simulaatioiden lukumäärä ja $n$ kaiken kaikkiaan suoritettujen simulaatioiden lukumäärä.
+
+UCB:sta poiketen algoritmille annetaan tutkimusvakio (\textit{exploration term}) $C_p$ joka vaikuttaa algoritmin painotukseen uusien vaihtoehtojen tutkimuksen ja hyväksi tunnettujen hyödyntämisen välillä. Edetessään pelipuussa UCT pyrkii maksimoimaan seuraavan lausekkeen arvon:
+\begin{equation}
+UCT = \overline{X}_j + 2C_p \sqrt{\frac{2 \ln n}{n_j}}
+\end{equation}
 
 Browne ym. esittelee UCT:n seuraavalla algoritmilla:~\cite{browne}
 \begin{center}
 \captionof{algorithm}{Upper Confidence Bounds for Trees}
 \begin{algorithmic}[0]
+
+\begin{samepage}
+\Function{UctHaku}{$s_0$}
+	\State luo pelipuun juuri $v_0$ pelitilanteesta $s_0$
+	\While{laskenta-aikaa on jäljellä}
+		\State $v_1 \leftarrow$ \Call{ValitseLapsi}{$v_0$}
+		\State $\Delta \leftarrow$ \Call{Simuloi}{$s(v_1)$}
+		\State \Call{Vastavirta}{$v_1$, $\Delta$}
+	\EndWhile
+	\State \Return siirto(\Call{ParasLapsi}{$v_0$})
+\EndFunction
+\end{samepage}
+\\
 \begin{samepage}
 \Function{ValitseLapsi}{$v$}
 	\While{$v$ ei ole lehti}
@@ -221,6 +246,15 @@ Browne ym. esittelee UCT:n seuraavalla algoritmilla:~\cite{browne}
 			\State $v \leftarrow$ \Call{ParasLapsi}{$v, C_p$}
 		\EndIf
 	\EndWhile
+	\State \Return{$v$}
+\EndFunction
+\end{samepage}
+\\
+\begin{samepage}
+\Function{Laajenna}{$v$}
+	\State valitse $a$ joka on tutkimaton siirto tilasta $s(v)$
+	\State lisää $v$:lle lapsi $v'$ siten että $s(v') = f(s(v), a)$
+	\State \Return $v'$
 \EndFunction
 \end{samepage}
 \\
@@ -252,7 +286,7 @@ Browne ym. esittelee UCT:n seuraavalla algoritmilla:~\cite{browne}
 \end{algorithmic}
 \end{center}
 
-Missä $s(v)$ on solmun $v$ kuvaama pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä. $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$.
+Missä $s(v)$ on solmun $v$ kuvaama pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä, ja $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$.
 
 
 \section{Erityisiä hyötyjä}
