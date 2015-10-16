@@ -95,7 +95,11 @@
 \author{Kalle Viiri}
 \date{\today}
 \level{Aine}
-\abstract{}
+\abstract{Monte Carlo -puuhaku (\textit{Monte Carlo Tree Search}) on puuhakualgoritmi, jota on käytetty pelitekoälyissä lupaavin tuloksin erityisesti gon saralla. Menetelmä korvaa perinteisen \textit{minimax}-haun kanssa tyypillisesti käytetyn heuristiikan satunnaistetulla simuloinnilla osittaisessa pelipuussa. Tämä mahdollistaa menetelmän käyttämisen myös peleissä, joihin ei tunneta hyviä heuristiikkoja.
+
+Puuhaun toteutuksen tehokkuus riippuu paljon simuloitavien solmujen valinnasta. Suosituin Monte Carlo -puuhaun toteutus, puiden luottamusylärajamenetelmä, hyödyntää aikaisempaa tutkimusta monikätisen rosvon ongelmasta (\textit{multi-armed bandit problem}) ja siihen kehitetystä luottamusylärajamenetelmästä valitakseen simuloitavat solmut tehokkaasti niiden odotusarvon perusteella.
+
+Monte Carlo -puuhaun vahvuus pelitekoälynä kasvaa, mitä enemmän laskenta-aikaa se saa käyttöönsä. Haku on kuitenkin katkaistavissa tai aikarajattavissa, jolloin sitä voi soveltaa kombinatoristen pelien lisäksi myös reaaliaikaisiin peleihin. Sopivien determinisaatiotekniikoiden avulla menetelmää voi soveltaa myös peleihin, joissa esiintyy satunnaistekijöitä tai epätäydellistä informaatiota.}
 
 % The following can be used to specify keywords and classification of the paper:
 
@@ -172,7 +176,7 @@ Keskeneräisen pelitilanteen perusteella voidaan laskea arvio sen edullisuudesta
 
 \section{Monte Carlo -puuhaku}
 
-Monte Carlo -puuhaku~\cite{browne} (\textit{Monte Carlo Tree Search}, jatkossa MCTS) on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Perusajatuksena on, että toistamalla simulaatioita ja tarkastelemalla lopputuloksia saadaan toimiva arvio pelitilanteen arvosta pelaajalle.
+Monte Carlo -puuhaku (\textit{Monte Carlo Tree Search}, jatkossa MCTS)~\cite{browne} on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Perusajatuksena on, että toistamalla simulaatioita ja tarkastelemalla lopputuloksia saadaan toimiva arvio pelitilanteen arvosta pelaajalle.
 
 MCTS-menetelmässä pelipuuta rakennetaan iteratiivisesti tarpeen mukaan. Haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan etsimällä juuresta alkaen pelitilanteita, joita vastaavilla solmuilla on pelipuuhun liittymättömiä lapsia. Laajennettavan solmun valinta ei väistämättä tapahdu tasapuolisesti, vaan esimerkiksi haaroja, joista on saatu lupaavia tuloksia, voidaan laajentaa muita enemmän.
 
@@ -196,6 +200,7 @@ Algoritmissa \ref{MCTS} esittellään Brownen ym. yleistetty MCTS~\cite{browne}.
 	\State \Return siirto(\Call{ParasLapsi}{$v_0$})
 \EndFunction
 \end{algorithmic}
+\rule{\textwidth}{1pt}
 \end{center}
 \end{samepage}
 
@@ -205,19 +210,19 @@ Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes suoritus katkais
 
 \subsection{Monikätisen rosvon ongelma}
 
-Monikätisen rosvon optimointiongelmassa~\cite{browne} (\textit{multi-armed bandit problem}) pelaajalla on peliautomaatti, jossa on $K$ vipua. Jokaiselle vivulle on määritelty pelaajalle tuntematon todennäköisyysjakauma, jonka mukaan pelaaja saa palkinnon vetäessään vipua. Ongelmana on löytää strategia, jolla minimoidaan pelkästään parasta vipua pelaavan strategian kokonaispalkinnon etumatka omaamme nähden.
+Monikätisen rosvon optimointiongelmassa (\textit{multi-armed bandit problem})~\cite{browne} pelaajalla on peliautomaatti, jossa on $K$ vipua. Jokaiselle vivulle on määritelty pelaajalle tuntematon todennäköisyysjakauma, jonka mukaan pelaaja saa palkinnon vetäessään vipua. Ongelmana on löytää strategia, jolla minimoidaan pelkästään parasta vipua pelaavan strategian kokonaispalkinnon etumatka omaamme nähden.
 
-Tehokkaan pelistrategian löytäminen monikätisen rosvon ongelmaan edellyttää algoritmia, joka osaa pelata paljon vivuilla joista on jo saatu hyviä tuloksia. Samalla kuitenkin sen on tutkittava välillä muitakin vipuja, jotta mahdollisesti huomaamatta jääneet vivut voidaan hyödyntää. Tällaisen strategian esittelevät Auer ym. joiden luottamusylärajan menetelmä~\cite{auer} (\textit{Upper Confidence Bounds}, jatkossa UCB1) valitsee pelattavaksi vivun joka maksimoi lausekkeen
+Tehokkaan pelistrategian löytäminen monikätisen rosvon ongelmaan edellyttää algoritmia, joka osaa pelata paljon vivuilla joista on jo saatu hyviä tuloksia. Samalla kuitenkin sen on tutkittava välillä muitakin vipuja, jotta mahdollisesti huomaamatta jääneet paremmat vivut voidaan hyödyntää\footnote{Vastaavia valintatilanteita hyvien vaihtoehtojen käytön ja parempien valintojen etsimisen välillä kutsutaan tutkimus-hyväksikäyttö -dilemmaksi (\textit{exploration-exploitation dilemma}).}. Tällaisen strategian esittelevät Auer ym. joiden luottamusylärajan menetelmä~\cite{auer} (\textit{Upper Confidence Bounds}, jatkossa UCB1) valitsee pelattavaksi vivun joka maksimoi lausekkeen
 \begin{equation}
 \text{UCB1} = \overline{X}_j + \sqrt{\frac{2 \ln n}{n_j}}
 \end{equation}
 arvon, missä $X_j$ on vivun $j$ tuottamien palkintojen keskiarvo, $n_j$ on vivun $j$ pelikertojen määrä tähän mennessä ja $n$ on koko pelikoneen pelikertojen määrä. Tasapelit ratkaistaan toteutuksissa tyypillisesti satunnaisesti, ja kun $n_j = 0$ katsotaan että $\text{UCB1} = \infty$ eli kaikkia vipuja kokeillaan vähintään kerran ennen kuin yhtäkään pelataan toista kertaa~\cite{browne}.
 
-Lai ja Robbins osoittivat, että useille palkintojakaumille ei ole olemassa monikätisen rosvon pelistrategiaa, jossa ainoastaan parasta vipua pelaavan strategian etumatka kasvaa hitaammin kuin $O(ln)$~\cite{lai, browne}. UCB1:n katumus kasvaa logaritmisesti, joten sitä voi pitää hyvänä ratkaisuna monikätisen rosvon ongelmaan. Se on myös yksinkertainen ja tehokas~\cite{browne}, joten se on mielekäs ratkaisu sovellettavaksi toisiin ongelmiin, kuten puun laajentamiseen MCTS:ssä.
+Lai ja Robbins osoittivat, että useille palkintojakaumille ei ole olemassa monikätisen rosvon pelistrategiaa, jossa ainoastaan parasta vipua pelaavan strategian etumatka kasvaa hitaammin kuin $O(\ln n)$~\cite{lai, browne}. UCB1:lla optimaalisen strategian etumatka logaritmisesti, joten sitä voi pitää hyvänä ratkaisuna monikätisen rosvon ongelmaan. Se on myös yksinkertainen ja tehokas~\cite{browne}, joten se on mielekäs ratkaisu sovellettavaksi toisiin ongelmiin, kuten puun laajentamiseen MCTS:ssä.
 
 \subsection{Luottamusylärajat puuhaussa}
 
-Kocsisin ym. esittelemä puuhakujen luottamusyläraja -menetelmä (\textit{Upper Confidence Bounds for Trees}~\cite{browne, kocsis} jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. UCT mallintaa pelipuuta laajentaessa solmun valinnan monikätisen rosvon ongelmana, ja käyttää pelistrategiana muunnelmaa UCB1:stä. Tällöin $X_j$ on solmun $j$ kautta suoritettujen simulaatioiden lopputulosten keskiarvo, $n_j$ solmun $j$ läpi suoritettujen simulaatioiden lukumäärä ja $n$ kaiken kaikkiaan suoritettujen simulaatioiden lukumäärä.
+Kocsisin ym. esittelemä puuhakujen luottamusyläraja -menetelmä (\textit{Upper Confidence Bounds for Trees} jatkossa UCT)~\cite{browne, kocsis} on yleisimpiä algoritmeja MCTS:n toteutukseen. UCT mallintaa pelipuuta laajentaessa solmun valinnan monikätisen rosvon ongelmana, ja käyttää pelistrategiana muunnelmaa UCB1:stä. Tällöin $X_j$ on solmun $j$ kautta suoritettujen simulaatioiden lopputulosten keskiarvo, $n_j$ solmun $j$ läpi suoritettujen simulaatioiden lukumäärä ja $n$ kaiken kaikkiaan suoritettujen simulaatioiden lukumäärä.
 
 UCB1:sta poiketen algoritmille annetaan tutkimusvakio (\textit{exploration term}) $C_p$ joka vaikuttaa algoritmin painotukseen uusien vaihtoehtojen tutkimuksen ja hyväksi tunnettujen hyödyntämisen välillä. Edetessään pelipuussa UCT pyrkii maksimoimaan seuraavan lausekkeen arvon:
 \begin{equation}
@@ -241,6 +246,7 @@ Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Alg
 	\State \Return siirto(\Call{ParasLapsi}{$v_0, 0$})
 \EndFunction
 \end{samepage}
+\\
 \\
 \begin{samepage}
 \Function{ValitseLapsi}{$v$}
@@ -289,29 +295,29 @@ Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Alg
 \EndFunction
 \end{samepage}
 \end{algorithmic}
+\rule{\textwidth}{1pt}
 \end{center}
-
 
 
 \section{MCTS ei-kombinatorisissa peleissä}
 
 \subsection{Epätäydellinen informaatio ja satunnaisuus}
 
-Epätäydellisen informaation peli~\cite{browne} on peli, jossa kaikki pelaajat eivät tiedä kaikkea vallitsevasta pelitilanteesta. Esimerkiksi pokerissa kukin pelaaja näkee vain oman kätensä kortit. Monessa pelissä pelitilanteeseen vaikuttavat myös satunnaistekijät, kuten nopanheitot. MCTS on erilaisten apukeinojen avulla sovellettavissa myös peleihin, joissa informaatio on epätäydellistä ja osa pelitilanteesta määräytyy satunnaistekijöiden kautta~\cite{browne}.
+Epätäydellisen informaation peli on peli, jossa kaikki pelaajat eivät tiedä kaikkea vallitsevasta pelitilanteesta~\cite{browne}. Esimerkiksi pokerissa kukin pelaaja näkee vain oman kätensä kortit. Monessa pelissä pelitilanteeseen vaikuttavat myös satunnaistekijät, kuten nopanheitot. MCTS on erilaisten apukeinojen avulla sovellettavissa myös peleihin, joissa informaatio on epätäydellistä ja osa pelitilanteesta määräytyy satunnaistekijöiden kautta~\cite{browne}.
 
-Determinisaatiolla~\cite{browne} tarkoitetaan mahdollisesti epätäydellistä informaatiota ja satunnaistekijöitä sisältävän pelin muuntamista täydellisen informaation deterministiseksi peliksi, jolloin sitä voi käsitellä kombinatorisen pelin tapaan. Determinisoitu peli avaa kaiken informaation kaikille pelaajille ja kiinnittää satunnaistekijöiden arvot tunnetuiksi. Esimerkiksi determinisoidussa pokerissa pelataan avoimin kortein. Menetelmän tarkoituksena on luoda monta determinisoitua pelitilannetta pelistä, soveltaa niihin kombinatorisen pelin MCTS-menetelmää ja käyttää tuloksia toimintamallin valitsemiseen alkuperäisessä pelissä.
+Determinisaatiolla tarkoitetaan satunnaisuutta tai epätäydellistä informaatiota sisältävän pelin analysointia käsittelemällä sitä deterministisen pelin tavoin~\cite{browne}. Determinisoitavasta pelitilanteesta luodaan mahdollisia pelitilanteita, joissa kaikki informaatio on pelaajille avointa ja satunnaistekijöiden arvot on kiinnitetty tunnetuiksi. Nämä pelitilanteet kuvaavat mahdollisia tilanteita eri satunnaistilojen ja piilotetun informaation arvoille. Niihin voidaan soveltaa kombinatorisen pelin MCTS-menetelmää, ja saatuja tuloksia voidaan käyttää toimintamallin valitsemiseen alkuperäisessä epädeterministisessä pelissä.
 
-Vastustajan strategian mallintaminen on erityisen tärkeää, kun pelin informaatio on epätäydellistä~\cite{browne}. Ainoastaan vastustajan tiedossa oleva informaatio vaikuttaa usein tämän tekemiin siirtoihin, jolloin vastustajan strategiasta voi muodostaa johtopäätöksiä vain tämän tiedossa olevasta informaatiosta. Esimerkiksi Ponsen ym.~\cite{ponsen} käytti pokerissa vastustajan mallinnusta Bayes-verkoilla päätelläkseen vastustajan kädessä olevien korttien todennäköisyysjakauman ja hyödynsi tuloksia determinisoitujen pelien luomisessa MCTS:ä varten.
+Vastustajan strategian mallintaminen on erityisen tärkeää, kun pelin informaatio on epätäydellistä~\cite{browne}. Ainoastaan vastustajan tiedossa oleva informaatio voi vaikuttaa tämän tekemiin siirtoihin, jolloin vastustajan strategiasta voi muodostaa johtopäätöksiä vain tämän tiedossa olevasta informaatiosta. Esimerkiksi Ponsen ym.~\cite{ponsen} käyttivät pokerissa vastustajan mallinnusta Bayes-verkoilla päätelläkseen vastustajan kädessä olevien korttien todennäköisyysjakauman ja hyödynsi tuloksia determinisoitujen pelien luomisessa MCTS:ä varten.
 
 \subsection{Videopelit}
 
-Reaaliaikaisessa pelissä~\cite{browne} pelitilanne voi edetä, vaikka pelaaja ei toimisi mitenkään. Tämä pakottaa pelaajan toimimaan erityisen nopeasti, sillä liian pitkään mietitty siirto voi muuttua harkinnan aikana huonoksi. Useimmat reaaliaikaiset pelit ovat videopelejä, joissa esiintyy lisäksi muitakin haasteita kuten satunnaisuutta, informaation epätäydellisyyttä ja erityisen suuria määriä mahdollisia pelitilanteita.
+Reaaliaikaisessa pelissä pelitilanne voi edetä, vaikka pelaaja ei toimisi mitenkään~\cite{browne}. Tämä pakottaa pelaajan toimimaan erityisen nopeasti, sillä liian pitkään mietitty siirto voi muuttua harkinnan aikana huonoksi. Useimmat reaaliaikaiset pelit ovat videopelejä, joissa esiintyy lisäksi muitakin haasteita kuten satunnaisuutta, informaation epätäydellisyyttä ja erityisen suuria määriä mahdollisia pelitilanteita.
 
-Samothrakis ym. tutkivat MCTS-pohjaisen menetelmän toimintaa \textit{Ms. Pac-Man} -pelissä~\cite{samothrakis}. Pelissä pelaaja kuljetta hahmoa sokkelossa tarkoituksena kerätä kartalla olevat pisteet ja vältellä vihollisia. Vastapelaajina on neljä vihollista, joiden osittain satunnainen tekoäly pyrkii nappaamaan pelihahmon. Pelissä ei ole suoranaisia lopputiloja paitsi pelaajan hävitessä, joten MCTS:n simulaatiovaiheen täytyy rajata haku muilla tavoin. Samothrakis ym. ratkaisi ongelman rajaamalla simulaation maksimisyvyyden ja käyttämällä haun katkaisusolmun arviointiin yksinkertaista heuristiikkaa.
+Samothrakis ym. tutkivat MCTS-pohjaisen menetelmän toimintaa \textit{Ms. Pac-Man} -pelissä~\cite{samothrakis}. Pelissä pelaaja kuljettaa hahmoa sokkelossa tarkoituksenansa kerätä kartalla olevat pisteet ja vältellä vihollisia. Vastapelaajina on neljä vihollista, joiden osittain satunnainen tekoäly pyrkii nappaamaan pelihahmon. Pelissä ei ole suoranaisia lopputiloja paitsi pelaajan hävitessä, joten MCTS:n simulaatiovaiheen täytyy rajata haku muilla tavoin. Samothrakis ym. ratkaisi ongelman rajaamalla simulaation maksimisyvyyden ja käyttämällä haun katkaisusolmun arviointiin yksinkertaista heuristiikkaa.
 
 Toinen haaste \textit{Ms. Pac-Man} -pelissä on ajoituksen tarkkuus. Samothrakis ym. toteaa, että peli vaatii siirtojen tapahtuvan jopa 50-60 millisekunnin tarkkuudella, mikä asettaa tiukan rajan pelipuussa suoritettavan simulaation määrälle. Tulokset havaittiin kuitenkin erittäin hyviksi, ja MCTS-menetelmällä toimiva tekoäly keräsi testeissä evolutiivisia ja geneetisiä algoritmeja sekä vahvistusoppimista hyödyntäviä menetelmiä kahta kertaluokkaa paremmat pisteet.
 
-\section{Erityisiä hyötyjä}
+\section{Yhteenveto}
 
 MCTS:n vahvuus on sen helppo sovellettavuus erilaisiin ongelmiin~\cite{browne}. Koska se ei tarvitse heuristiikkaa, tekoälyn ohjelmoijan ei tarvitse tietää pohjalla olevasta pelistä muuta kuin perussäännöt. Heuristiikan liittäminen MCTS:ään on kuitenkin mahdollista sekä lopputilojen korvaamiseen kuten \textit{Ms. Pac-Man} -esimerkissä että haun tehokkaampaan kohdistamiseen pelipuussa~\cite{browne}.
 
