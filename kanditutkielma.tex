@@ -99,7 +99,7 @@
 
 Puuhaun toteutuksen tehokkuus riippuu paljon simuloitavien solmujen valinnasta. Suosituin Monte Carlo -puuhaun toteutus, puiden luottamusylärajamenetelmä, hyödyntää aikaisempaa tutkimusta monikätisen rosvon ongelmasta (\textit{multi-armed bandit problem}) ja siihen kehitetystä luottamusylärajamenetelmästä valitakseen simuloitavat solmut tehokkaasti niiden odotusarvon perusteella.
 
-Monte Carlo -puuhaun vahvuus pelitekoälynä kasvaa, mitä enemmän laskenta-aikaa se saa käyttöönsä. Haku on kuitenkin katkaistavissa tai aikarajattavissa, jolloin sitä voi soveltaa kombinatoristen pelien lisäksi myös reaaliaikaisiin peleihin. Sopivien determinisaatiotekniikoiden avulla menetelmää voi soveltaa myös peleihin, joissa esiintyy satunnaistekijöitä tai epätäydellistä informaatiota.}
+Monte Carlo -puuhaun vahvuus pelitekoälynä kasvaa käytettävissä olevan laskenta-ajan kasvaessa. Haku on kuitenkin katkaistavissa tai aikarajattavissa, jolloin sitä voi soveltaa kombinatoristen pelien lisäksi myös reaaliaikaisiin peleihin. Sopivien determinisaatiotekniikoiden avulla menetelmää voi soveltaa myös peleihin, joissa esiintyy satunnaistekijöitä tai epätäydellistä informaatiota.}
 
 % The following can be used to specify keywords and classification of the paper:
 
@@ -149,7 +149,7 @@ Monte Carlo -puuhaun vahvuus pelitekoälynä kasvaa, mitä enemmän laskenta-aik
 
 \subsection{Peliteoria ja pelipuu}
 
-Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista~\cite{browne}. Mahdollisten pelitilanteiden joukkoa merkataan $S$:llä. Pelillä on alkutila $s_0 \in S$ ja joukko lopputiloja $S_T \subseteq S$. Mahdollisten siirtojen joukkoa merkitään $A$:lla, ja tilasiirtymäfunktio $f : S \times A \rightarrow S$ määrittää, mihin tilaan päädytään lähtötilasta milläkin siirrolla.
+Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista~\cite{browne}. Mahdollisten pelitilanteiden joukkoa merkitään $S$. Pelillä on alkutila $s_0 \in S$ ja joukko lopputiloja $S_T \subseteq S$. Mahdollisten siirtojen joukkoa merkitään $A$:lla, ja tilasiirtymäfunktio $f : S \times A \rightarrow S$ määrittää, mihin tilaan päädytään lähtötilasta milläkin siirrolla.
 
 Pelin lopputuloksen edullisuus pelaajalle määritellään palkintofunktiolla $R : S \rightarrow \mathbb{R}$. Tässä tekstissä käytetään usein käytettyä palkintofunktiota, joka on arvoltaan $0$ pelitilanteissa jotka eivät ole lopputilanteita, ja lopputilanteille $1$ voittavista tilanteista, $0$ tasapeleistä ja $-1$ häviöistä.
 
@@ -165,15 +165,15 @@ Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{
 
 Esimerkkejä kombinatorisista peleistä ovat shakki ja go. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu kuitenkin edistynyttä strategiaa~\cite{browne}.
 
-Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta, ja jokaisen solmun lapset pelitilanteita jotka solmun kuvaamasta pelitilanteesta voi saavuttaa. Pelipuun lehtisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä voi käsitellä tavallisilla puuhakualgoritmeilla~\cite{aima}.
+Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pelin alkutilannetta ja jokaisen solmun lapset pelitilanteita, jotka solmun kuvaamasta pelitilanteesta voi saavuttaa. Pelipuun lehtisolmut ovat lopputilanteita, joissa pelin lopputulos määräytyy. Pelipuuna mallinnettua peliä voi käsitellä tavallisilla puuhakualgoritmeilla~\cite{aima}.
 
 \subsection{Minimax ja heuristiikka}
 
 Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
 
-\textit{Minimax}-haun ongelmana on se, että vain puun lehtisolmujen arvo on tiedossa pelaajille~\cite{aima}. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti jotta hakua voitaisiin jatkaa lehtisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa, on haku katkaistava ennen pelin lopputilanteisiin pääsemistä. Koska haku ei välttämättä pääse pelin lopputilanteisiin saakka, tarvitsee se keinon arvioida keskeneräisiä pelitilanteita lopputilanteiden tavoin.
+\textit{Minimax}-haun ongelmana on se, että vain puun lehtisolmujen arvo on tiedossa pelaajille~\cite{aima}. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa, tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti, jotta hakua voitaisiin jatkaa lehtisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa, on haku katkaistava ennen pelin lopputilanteisiin pääsemistä. Koska haku ei välttämättä pääse pelin lopputilanteisiin saakka, se tarvitsee keinon arvioida keskeneräisiä pelitilanteita lopputilanteiden tavoin.
 
-Keskeneräisen pelitilanteen perusteella voidaan laskea arvio sen edullisuudesta pelaajalle. Tällaisen arvion muodostavaa funktiota kutsutaan heuristiikaksi. Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
+Keskeneräisen pelitilanteen perusteella voidaan laskea arvio sen edullisuudesta pelaajalle. Tällaisen arvion muodostavaa funktiota kutsutaan heuristiikaksi. Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja, joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
 
 
 \section{Monte Carlo -puuhaku}
@@ -228,12 +228,11 @@ Lai ja Robbins osoittivat, että useille palkintojakaumille ei ole olemassa moni
 
 Kocsisin ym. esittelemä puuhakujen luottamusyläraja -menetelmä (\textit{Upper Confidence Bounds for Trees} jatkossa UCT)~\cite{browne, kocsis} on yleisimpiä algoritmeja MCTS:n toteutukseen. UCT mallintaa pelipuuta laajentaessa solmun valinnan monikätisen rosvon ongelmana, ja käyttää pelistrategiana muunnelmaa UCB1:stä. Tällöin $X_j$ on solmun $j$ kautta suoritettujen simulaatioiden lopputulosten keskiarvo, $n_j$ solmun $j$ läpi suoritettujen simulaatioiden lukumäärä ja $n$ kaiken kaikkiaan suoritettujen simulaatioiden lukumäärä.
 
-UCB1:sta poiketen algoritmille annetaan tutkimusvakio (\textit{exploration term}) $C_p$ joka vaikuttaa algoritmin painotukseen uusien vaihtoehtojen tutkimuksen ja hyväksi tunnettujen hyödyntämisen välillä. Edetessään pelipuussa UCT pyrkii maksimoimaan seuraavan lausekkeen arvon:
+UCB1:sta poiketen algoritmille annetaan tutkimusvakio (\textit{exploration term}) $C_p$ joka vaikuttaa algoritmin painotukseen uusien vaihtoehtojen tutkimuksen ja hyväksi tunnettujen hyödyntämisen välillä. Edetessään pelipuussa UCT pyrkii maksimoimaan lausekkeen
 \begin{equation}
 \text{UCT} = \overline{X}_j + C_p \sqrt{\frac{2 \ln n}{n_j}}
 \end{equation}
-
-Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Algoritmissa $s(v)$ on solmun $v$ kuvaama pelitilanne, $f(s(v), a)$ on tilanteesta $s(v)$ siirrolla $a$ saavutettava pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä ja $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$. Algoritmi palauttaa siirron, joka johtaa lapseen jolla on paras odotusarvo.
+arvon. Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Algoritmissa $s(v)$ on solmun $v$ kuvaama pelitilanne, $f(s(v), a)$ on tilanteesta $s(v)$ siirrolla $a$ saavutettava pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä ja $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$. Algoritmi palauttaa siirron, joka johtaa lapseen jolla on paras odotusarvo.
 
 \begin{center}
 \captionof{algorithm}{UCT-algoritmi}
@@ -306,9 +305,17 @@ Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Alg
 
 Go on kombinatorinen lautapeli, jota on pelattu Aasiassa jo yli kahdentuhannen vuoden ajan. Pelissä kaksi pelaajaa asettaa vuorotellen pelilaudan ruudukon risteyksiin kiviksi kutsuttuja pelinappuloita tarkoituksenaan vallata pelilaudan alueita ja poistaa vastustajan kiviä ympäröimällä ne omillaan. Pelin voittaja määräytyy pelaajien hallitseman alueen ja vastustajiltaan poistettujen kivien määrän perusteella.
 
-Go-lautoja on erikokoisia, mutta virallisissa kilpailuissa käytetään yleensä $19 \times 19$ -risteyksen lautaa. Näin isolla laudalla pelit kestävät tyypillisesti satoja vuoroja, ja kullakin vuorolla mahdollisia siirtoja on keskimäärin noin 250. Pelipuu on siis kohtuuttoman suuri käsiteltäväksi perinteisellä minimax-haulla. Go-peliin on myös vaikea kehittää vahvoja heuristiikkoja, sillä yksittäisten kivien tai kiviryhmien arvo pelaajalle voi riippua paljon pelilaudan kokonaistilanteesta tai tulla ilmeiseksi vasta paljon myöhemmin pelissä.
+Go-lautoja on erikokoisia, mutta virallisissa kilpailuissa käytetään yleensä $19 \times 19$ -risteyksen lautaa. Näin isolla laudalla pelit kestävät tyypillisesti satoja vuoroja, ja kullakin vuorolla mahdollisia siirtoja on keskimäärin noin 250~\cite{browne}. Pelipuu on siis kohtuuttoman suuri käsiteltäväksi perinteisellä minimax-haulla. Gohon on myös vaikea kehittää vahvoja heuristiikkoja, sillä yksittäisten kivien tai kiviryhmien arvo pelaajalle voi riippua paljon pelilaudan kokonaistilanteesta tai tulla ilmeiseksi vasta paljon myöhemmin pelissä.
 
+MCTS on suosittu menetelmä go-tekoälyissä. Menetelmää sovellettiin peliin ensimmäistä kertaa 2006, ja ammattilaispelaajan pienellä $9 \times 9$ -laudalla voittava MCTS-tekoäly esiteltiin vuonna 2008~\cite{browne}. MCTS toimii gossa perinteisiä minimax-menetelmiä paremmin, sillä sen simulaatioon perustuva lähestymistapa ei tarvitse heuristiikkaa ja havaitsee siirtojen kauaskantoisempia vaikutuksia itsestään. Parhaita tuloksia saavuttavat tekoälypelaajat eivät kuitenkaan käytä pelkkää MCTS:ää, vaan yhdistävät menetelmään perinteisen tekoälyn piirteitä.
 
+Parhaat gon tekoälypelaajat käyttävät ensimmäisen siirron heuristiikkaa (\textit{All moves as first}, jatkossa AMAF)~\cite{browne}. AMAF päivittää laajennettavan solmun lisäksi simulaatiovaiheessa pelattavien siirtojen odotusarvoja $\Delta$:n mukaan. AMAF vaikuttaa simulaation tulokseen lisäämällä simulaatiokertojen määrää siirroille kasvattamatta tarvittaevien simulaatioiden määrää. Näin saadaan nopeasti tarkempi odotusarvo, joka voi kuitenkin olla harhaanjohtava, jos siirron arvo muuttuu paljon pelin edetessä.
+
+AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerrointa $\alpha$ painottaakseen solmun odotusarvon kertymistä. Kukin solmu saa odotusarvokseen
+\begin{equation}
+\alpha A + (1 - \alpha)U
+\end{equation}
+missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on solmun odotusarvo siitä lähteneiden simulaatioiden perusteella. Erityisen suosittu AMAF-muunnelma on RAVE (\textit{Rapid Action Value Estimation}) joka toimii kuten $\alpha$-AMAF, mutta pienentää $\alpha$ arvoa solmun vierailukertojen mukaan. Tämä heuristiikka saa nopeasti karkeita arvioita, mutta vaihtaa hitaasti edetessään painotustaan kohti tarkempaa, tavallista UCT:tä~\cite{browne}.
 
 \section{MCTS ei-kombinatorisissa peleissä}
 
