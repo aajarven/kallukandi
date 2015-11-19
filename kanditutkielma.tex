@@ -326,13 +326,21 @@ Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin p
 
 \section{Rinnakkaistettu MCTS}
 
-MCTS on mahdollista rinnakkaistaa siten, että algoritmi suorittaa useita simulaatioita samanaikaisesti~\cite{browne, cazenave}. Rinnakkaistaminen nopeuttaa valmiiden simulaatiotulosten kertymistä, jolloin tekoälyn kilpailukyky kasvaa laskenta-ajan pysyessä samana. Rinnakkaistamisessa on kuitenkin haasteena eriytettyjen laskentaprosessien välinen tahdistus ja viestintä.
+MCTS on mahdollista rinnakkaistaa siten, että algoritmi suorittaa useita simulaatioita samanaikaisesti~\cite{browne, cazenave}. Rinnakkaistaminen nopeuttaa valmiiden simulaatiotulosten kertymistä, jolloin tekoälyn kilpailukyky kasvaa laskenta-ajan pysyessä samana. Rinnakkaistamisessa on kuitenkin haasteena eriytettyjen laskentasäikeiden välinen tahdistus ja viestintä.
 
 Chaslot ym. luettelevat kolme keskeistä menetelmää MCTS:n rinnakkaistamiseen~\cite{chaslot}. Cazenaven ym. go-tekoälyjä varten kehittämä lehtirinnakkaistaminen~\cite{cazenave} on malleista yksinkertaisin. Lehtirinnakkaistetussa MCTS:ssä laajennettava solmu valitaan sarjallisesti, mutta siitä suoritetaan useita rinnakkaisia simulaatioita jotka valitsevat omat polkunsa pelipuun läpi. Menetelmä on yksinkertainen toteuttaa eikä vaadi muistialueiden suojaamista samanaikaiselta käsittelyltä~\cite{chaslot}.
 
 Kukin rinnakkaistettu simulaatiokierros kestää keskimäärin kauemmin suorittaa kuin sarjallinen simulaatiokierros, sillä eri simulaatioilla voi kestää selvästi toisia kauemmin päästä pelin lopputilanteeseen~\cite{chaslot}. Koko simulaatiokierros voidaan päättää vasta kun hitain simulaatio on suoritettu loppuun.
 
-Juuririnnakkaistaminen on myös Cazenaven ym. kehittämä MCTS:n rinnakkaistusalgoritmi, jossa myös laajennettavan solmun valinta rinnakkaistetaan~\cite{cazenave, chaslot}. Menetelmä rakentaa useita pelipuita, jotka suorittavat rinnakkain toisistaan riippumatta omat puuhakunsa. Kun laskenta-aika on käytetty loppuun, koostetaan näiden pelipuiden saamista tuloksista odotusarvot juurisolmun lapsille, ja valitaan pelattava siirto sen mukaan.
+Puurinnakkaistaminen on Chaslotin ym. esittelemä rinnakkaistamismenetelmä, joka suorittaa samanaikaisia MCTS-prosesseja samalle pelipuulle~\cite{chaslot}. Koska useampi hakusäie käsittelee samaa puuta, täytyy estää enempää kuin yhtä säiettä kerrallaan pääsemästä käsiksi varsinaiseen pelipuuhun. Vain yksi säie kerrallaan voi siis laajentaa pelipuuta tai päivittää pelipuun solmujen arvoja simulaatiotuloksilla.
+
+Jos pelin kesto on pitkä ja simulaatiovaihe kestää vastaavasti kauan, ei varsinaisen pelipuun käytön rajaaminen ole kovin ongelmallista. Jos säikeet palaavatkin simulaatiovaiheesta usein puuhun, voi puun rajaaminen yhdelle säikeelle muodostua pullonkaulaksi~\cite{chaslot}. Vaihtoehtoisesti puuhun voi päästä useampia säikeitä niin, että jokainen pelipuun solmu rajataan vain yhden säikeen käyttöön kerrallaan. Tämä kuitenkin vaatii tiheää solmujen lukitsemista ja avaamista, johon kuluu ylimääräistä laskenta-aikaa.
+
+Puurinnakkaistamisen suorituskykylisäyksen heikkouksiin kuuluu sen liiallinen keskittyminen samoihin hakupolkuihin~\cite{browne, chaslot}. Koska kaikki hakusäikeet käyttävät samaa puuta, ja UCT suosii solmuja joista on saatu lupaavia tuloksia, säikeet tapaavat tutkia pientä osaa puusta todella tarkasti laajemman tiedustelun sijaan. Coulom~\cite{chaslot} ehdottaa ongelmaan ratkaisuksi tilapäistä sakkoarvoa, jonka säie jättää solmuun kulkiessaan sen läpi. Tämä saa toiset säikeet suosimaan muiden solmujen tutkimista mutta ei poissulje selvästi ylivertaisen solmun tutkimista usean säikeen voimin.
+
+Juuririnnakkaistaminen on Cazenaven ym. kehittämä MCTS:n rinnakkaistusalgoritmi, jossa myös laajennettavan solmun valinta rinnakkaistetaan~\cite{cazenave, chaslot}. Menetelmä rakentaa useita pelipuita, jotka suorittavat rinnakkain toisistaan riippumatta omat puuhakunsa. Kun laskenta-aika on käytetty loppuun, valitaan pelipuiden tuottamien tulosten mukaan pelattava siirto.
+
+Perinteinen ratkaisu pelattavan siirron valintaan on valita pelipuissa yhteenlasketusti eniten tutkittu solmu~\cite{browne}, mutta Soejima ym. esittelevät vaihtoehtoisen strategian, jossa siirto valitaan enemmistöäänestyksellä~\cite{soejima}. 
 
 \section{MCTS ei-kombinatorisissa peleissä}
 
