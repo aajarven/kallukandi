@@ -214,7 +214,7 @@ Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes suoritus katkais
 
 Monikätisen rosvon optimointiongelmassa (\textit{multi-armed bandit problem})~\cite{browne} pelaajalla on peliautomaatti, jossa on $K$ vipua. Jokaiselle vivulle on määritelty pelaajalle tuntematon todennäköisyysjakauma, jonka mukaan pelaaja saa palkinnon vetäessään vipua. Ongelmana on löytää strategia, jolla minimoidaan pelkästään parasta vipua pelaavan strategian kokonaispalkinnon etumatka omaamme nähden.
 
-Tehokkaan pelistrategian löytäminen monikätisen rosvon ongelmaan edellyttää algoritmia, joka osaa pelata paljon vivuilla joista on jo saatu hyviä tuloksia. Samalla kuitenkin sen on tutkittava välillä muitakin vipuja, jotta mahdollisesti huomaamatta jääneet paremmat vivut voidaan hyödyntää. Valintatilannetta aikaisemmin hyviä tuloksia antaneiden vaihtoehtojen ja parempien vaihtoehtojen etsimisen vähemmän tutkituista vivuista kutsutaan tutkimus-hyväksikäyttö -dilemmaksi (\textit{exploration-exploitation dilemma}).
+Tehokkaan pelistrategian löytäminen monikätisen rosvon ongelmaan edellyttää algoritmia, joka osaa pelata paljon vivuilla joista on jo saatu hyviä tuloksia. Samalla kuitenkin sen on tutkittava välillä muitakin vipuja, jotta mahdollisesti huomaamatta jääneet paremmat vivut voidaan hyödyntää. Valintatilannetta aikaisemmin hyviä tuloksia antaneiden vaihtoehtojen ja parempien vaihtoehtojen etsimisen vähemmän tutkituista vivuista kutsutaan tutkimus-hyödyntämis -dilemmaksi (\textit{exploration-exploitation dilemma}).
 
 Dilemman ratkaisevan strategian esittelevät Auer ym. joiden luottamusylärajan menetelmä~\cite{auer} (\textit{Upper Confidence Bounds}, jatkossa UCB1) valitsee pelattavaksi vivun joka maksimoi lausekkeen
 \begin{equation}
@@ -309,13 +309,30 @@ Go-lautoja on erikokoisia, mutta virallisissa kilpailuissa käytetään yleensä
 
 MCTS on suosittu menetelmä go-tekoälyissä. Menetelmää sovellettiin peliin ensimmäistä kertaa 2006, ja ammattilaispelaajan pienellä $9 \times 9$ -laudalla voittava MCTS-tekoäly esiteltiin vuonna 2008~\cite{browne}. MCTS toimii gossa perinteisiä minimax-menetelmiä paremmin, sillä sen simulaatioon perustuva lähestymistapa ei tarvitse heuristiikkaa ja havaitsee siirtojen kauaskantoisempia vaikutuksia itsestään. Parhaita tuloksia saavuttavat tekoälypelaajat eivät kuitenkaan käytä pelkkää MCTS:ää, vaan yhdistävät menetelmään perinteisen tekoälyn piirteitä.
 
-Parhaat gon tekoälypelaajat käyttävät ensimmäisen siirron heuristiikkaa (\textit{All moves as first}, jatkossa AMAF)~\cite{browne}. AMAF päivittää laajennettavan solmun lisäksi simulaatiovaiheessa pelattavien siirtojen odotusarvoja $\Delta$:n mukaan. AMAF vaikuttaa simulaation tulokseen lisäämällä simulaatiokertojen määrää siirroille kasvattamatta tarvittaevien simulaatioiden määrää. Näin saadaan nopeasti tarkempi odotusarvo, joka voi kuitenkin olla harhaanjohtava, jos siirron arvo muuttuu paljon pelin edetessä.
+Parhaat gon tekoälypelaajat käyttävät ensimmäisen siirron heuristiikkaa (\textit{All moves as first}, jatkossa AMAF)~\cite{browne}. AMAF-menetelmässä pelipuun solmut mallintavat siirtoja kokonaisten pleitilanteiden sijaan. Koska samat siirrot johtavat kombinatorisessa pelissä aina samaan tilanteeseen, tämä malli on yhtäpitävä tavallisen pelipuun kanssa. Tavallisen UCT:n tapaan AMAF valitsee osittaisesta pelipuusta laajennettavan solmun ja simuloi solmun kuvaamasta pelitilanteesta pelin lopputilaan asti saaden lopputulosta kuvaavan $\Delta$-arvon.
 
-AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerrointa $\alpha$ painottaakseen solmun odotusarvon kertymistä. Kukin solmu saa odotusarvokseen
+Toisin kuin tavallinen UCT, AMAF päivittää solmujen odotusarvoja $\Delta$:n avulla vaikka ne pelattaisiin myöhemmin simulaatiossa~\cite{browne, helmbold}. AMAF-heuristiikka siis olettaa siirtojen hyödyn pelaajalle voivan olla osittain pelitilanteesta riippumattomia. Tämä oletus lisää siirtojen laskemia simulaatiokertoja suorittamatta todellisuudessa enempää simulaatioita, joten solmujen odotusarvo kehittyy nopeasti. Odotusarvo voi kuitenkin kehittyä harhaanjohtavaksi siirroille, joiden arvo riippuu paljon muusta pelitilanteesta~\cite{helmbold}.
+
+AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerrointa $\alpha$ painottaakseen solmun odotusarvon kertymistä. Kukin solmu saa lopulliseksi odotusarvokseen
 \begin{equation}
 \alpha A + (1 - \alpha)U
 \end{equation}
-missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on solmun odotusarvo siitä lähteneiden simulaatioiden perusteella. Erityisen suosittu AMAF-muunnelma on RAVE (\textit{Rapid Action Value Estimation}) joka toimii kuten $\alpha$-AMAF, mutta pienentää $\alpha$ arvoa solmun vierailukertojen mukaan. Tämä heuristiikka saa nopeasti karkeita arvioita, mutta vaihtaa hitaasti edetessään painotustaan kohti tarkempaa, tavallista UCT:tä~\cite{browne}.
+missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on solmun normaali UCT:n mukainen odotusarvo. Erityisen suosittu AMAF-muunnelma on RAVE (\textit{Rapid Action Value Estimation}) joka toimii kuten $\alpha$-AMAF, mutta pienentää $\alpha$:n arvoa solmun vierailukertojen mukaan. Tämä heuristiikka saa nopeasti karkeita arvioita, mutta vaihtaa hitaasti edetessään painotustaan kohti tarkempaa, tavallista UCT:tä~\cite{browne}.
+
+\section{Pelipuun karsinta}
+
+Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin perustein. Perinteisessä pelitekoälyssä yleinen mentelmä on $\alpha$-$\beta$ -karsinta, joka katkaisee hakupolut, kun niiden on osoitettu olevan korkeintaan yhtä hyviä kuin vaihtoehtoiset siirrot. MCTS voi hyödyntää karsintamenetelmiä samaan tapaan jättääkseen arvioimatta selvästi huonoja vaihtoehtoja, jolloin se voi kohdistaa laskenta-aikansa parempien tilanteiden tutkimiseen~\cite{browne}.
+
+
+\section{Rinnakkaistettu MCTS}
+
+MCTS on mahdollista rinnakkaistaa siten, että algoritmi suorittaa useita simulaatioita samanaikaisesti~\cite{browne, cazenave}. Rinnakkaistaminen nopeuttaa valmiiden simulaatiotulosten kertymistä, jolloin tekoälyn kilpailukyky kasvaa laskenta-ajan pysyessä samana. Rinnakkaistamisessa on kuitenkin haasteena eriytettyjen laskentaprosessien välinen tahdistus ja viestintä.
+
+Chaslot ym. luettelevat kolme keskeistä menetelmää MCTS:n rinnakkaistamiseen~\cite{chaslot}. Cazenaven ym. go-tekoälyjä varten kehittämä lehtirinnakkaistaminen~\cite{cazenave} on malleista yksinkertaisin. Lehtirinnakkaistetussa MCTS:ssä laajennettava solmu valitaan sarjallisesti, mutta siitä suoritetaan useita rinnakkaisia simulaatioita jotka valitsevat omat polkunsa pelipuun läpi. Menetelmä on yksinkertainen toteuttaa eikä vaadi muistialueiden suojaamista samanaikaiselta käsittelyltä~\cite{chaslot}.
+
+Kukin rinnakkaistettu simulaatiokierros kestää keskimäärin kauemmin suorittaa kuin sarjallinen simulaatiokierros, sillä eri simulaatioilla voi kestää selvästi toisia kauemmin päästä pelin lopputilanteeseen~\cite{chaslot}. Koko simulaatiokierros voidaan päättää vasta kun hitain simulaatio on suoritettu loppuun.
+
+Juuririnnakkaistaminen on myös Cazenaven ym. kehittämä MCTS:n rinnakkaistusalgoritmi, jossa myös laajennettavan solmun valinta rinnakkaistetaan~\cite{cazenave, chaslot}. Menetelmä rakentaa useita pelipuita, jotka suorittavat rinnakkain toisistaan riippumatta omat puuhakunsa. Kun laskenta-aika on käytetty loppuun, koostetaan näiden pelipuiden saamista tuloksista odotusarvot juurisolmun lapsille, ja valitaan pelattava siirto sen mukaan.
 
 \section{MCTS ei-kombinatorisissa peleissä}
 
