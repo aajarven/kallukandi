@@ -319,7 +319,13 @@ AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerroin
 \end{equation}
 missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on solmun normaali UCT:n mukainen odotusarvo. Erityisen suosittu AMAF-muunnelma on RAVE (\textit{Rapid Action Value Estimation}) joka toimii kuten $\alpha$-AMAF, mutta pienentää $\alpha$:n arvoa solmun vierailukertojen mukaan. Tämä heuristiikka saa nopeasti karkeita arvioita, mutta vaihtaa hitaasti edetessään painotustaan kohti tarkempaa, tavallista UCT:tä~\cite{browne}.
 
-\section{Pelipuun karsinta}
+\section{Pelituntemuksen hyödyntäminen}
+
+\subsection{Simulaatiovaiheen tehostaminen}
+
+Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä ole kovin realistisia. Eräs tyypillinen parannus MCTS-algoritmiin on tehdä simulaatiovaiheesta älykkäämpi pelattavan pelituntemusta (\textit{domain knowledge}) hyödyntäen.
+
+Silver ym. käsittelevät artikkelissaan~\cite{silver} pelituntemuksen yhdistämistä UCT-hakuun. Yksi mahdollinen malli simulaatiovaiheen tehostamiseen on liittää simulaatiovaiheeseen tekoäly, joka valitsee vahvoja siirtoja joko koneoppimismenetelmien tai sille suoraan annetun heuristiikan avulla. Silver ym. huomasivat kuitenkin, että liian hyvin yksittäisiä siirtoja tekevä simulaatio tuottaa huonompia tuloksia kuin vapaammin pelipuuta tutkiva simulaatio.
 
 Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin perustein. Perinteisessä pelitekoälyssä yleinen mentelmä on $\alpha$-$\beta$ -karsinta, joka katkaisee hakupolut, kun niiden on osoitettu olevan korkeintaan yhtä hyviä kuin vaihtoehtoiset siirrot. MCTS voi hyödyntää karsintamenetelmiä samaan tapaan jättääkseen arvioimatta selvästi huonoja vaihtoehtoja, jolloin se voi kohdistaa laskenta-aikansa parempien tilanteiden tutkimiseen~\cite{browne}.
 
