@@ -178,11 +178,18 @@ Keskeneräisen pelitilanteen perusteella voidaan laskea arvio sen edullisuudesta
 
 \section{Monte Carlo -puuhaku}
 
-Monte Carlo -puuhaku (\textit{Monte Carlo Tree Search}, jatkossa MCTS)~\cite{browne} on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Perusajatuksena on, että toistamalla simulaatioita ja tarkastelemalla lopputuloksia saadaan toimiva arvio pelitilanteen arvosta pelaajalle.
+Monte Carlo -puuhaku (\textit{Monte Carlo Tree Search}, jatkossa MCTS)~\cite{browne} on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Kukin solmu hyödyntää kauttaan kulkeneita simulaatioita arvioidakseen odotusarvonsa. Perusajatuksena on, että simuloitujen pelien määrän kasvaessa odotusarvo tarkentuu vastaamaan niiden lähtötilanteen totuudenmukaista arvoa.
 
 MCTS-menetelmässä pelipuuta rakennetaan iteratiivisesti tarpeen mukaan. Haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan etsimällä juuresta alkaen pelitilanteita, joita vastaavilla solmuilla on pelipuuhun liittymättömiä lapsia. Laajennettavan solmun valinta ei väistämättä tapahdu tasapuolisesti, vaan esimerkiksi haaroja, joista on saatu lupaavia tuloksia, voidaan laajentaa muita enemmän.
 
 Kun laajennettava solmu on valittu, puuhun liitetään sen uudeksi lapseksi jokin siitä seuraava pelitilanne. Tästä lapsesta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$. Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien pelitilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
+
+\begin{figure}
+
+\includegraphics[width = \textwidth]{basicmcts.png}
+
+\caption{MCTS:n vaiheet. A: Laajennettavan solmun valinta pelipuusta. B:~Uuden solmun lisääminen ja simulaatio. C: Odotusarvojen päivittäminen vastavirtaan simulaation perusteella.}
+\end{figure}
 
 
 Algoritmissa \ref{MCTS} esittellään Brownen ym. yleistetty MCTS~\cite{browne}. Aliohjelmien \textsc{ValitseLapsi}, \textsc{Simuloi}, \textsc{Vastavirta} ja \textsc{ParasLapsi} toiminta on jätetty kuvaamatta, sillä ne vaihtelevat erilaisten MCTS-toteutusten välillä. Esimerkkitoteutus näille esitellään algoritmissa \ref{UCT}.
@@ -206,7 +213,7 @@ Algoritmissa \ref{MCTS} esittellään Brownen ym. yleistetty MCTS~\cite{browne}.
 \end{center}
 \end{samepage}
 
-Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes suoritus katkaistaan ulkopuolelta. Haun päätyttyä valitaan siirto, joka katsotaan parhaaksi haun aloitustilanteesta suoritettujen simulaatioiden perusteella. Haun päättyessä suoritettavan siirron valintaan mahdollisista siirroista on useita malleja~\cite{browne}. Voidaan esimerkiksi valita siirto, josta seuraavan tilan odotusarvo on korkein, tai siirto, josta on suoritettu eniten simulointeja ja jonka odotusarvo on siksi todennäköisesti lähimpänä sen todellista arvoa.
+Haku jatkuu niin kauan kuin laskenta-aikaa riittää tai kunnes suoritus katkaistaan ulkopuolelta. Haun päätyttyä valitaan siirto, joka katsotaan parhaaksi haun aloitustilanteesta suoritettujen simulaatioiden perusteella. Parhaan siirron valintaan mahdollisista siirroista on useita malleja~\cite{browne}. Yksi tapa on valita solmu, jolla on paras odotusarvo. Odotusarvo on kuitenkin epätarkka erityisesti vähän simuloiduille solmuille, joten tyypillistä on valita solmu sen kautta suoritettujen simulaatioiden määrän mukaan.
 
 \section{UCT-menetelmä}
 
@@ -326,6 +333,8 @@ missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on sol
 Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä ole kovin realistisia. Eräs tyypillinen parannus MCTS-algoritmiin on tehdä simulaatiovaiheesta älykkäämpi pelattavan pelituntemusta (\textit{domain knowledge}) hyödyntäen.
 
 Silver ym. käsittelevät artikkelissaan~\cite{silver} pelituntemuksen yhdistämistä UCT-hakuun. Yksi mahdollinen malli simulaatiovaiheen tehostamiseen on liittää simulaatiovaiheeseen tekoäly, joka valitsee vahvoja siirtoja joko koneoppimismenetelmien tai sille suoraan annetun heuristiikan avulla. Silver ym. huomasivat kuitenkin, että liian hyvin yksittäisiä siirtoja tekevä simulaatio tuottaa huonompia tuloksia kuin vapaammin pelipuuta tutkiva simulaatio.
+
+\subsection{Pelipuun karsinta}
 
 Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin perustein. Perinteisessä pelitekoälyssä yleinen mentelmä on $\alpha$-$\beta$ -karsinta, joka katkaisee hakupolut, kun niiden on osoitettu olevan korkeintaan yhtä hyviä kuin vaihtoehtoiset siirrot. MCTS voi hyödyntää karsintamenetelmiä samaan tapaan jättääkseen arvioimatta selvästi huonoja vaihtoehtoja, jolloin se voi kohdistaa laskenta-aikansa parempien tilanteiden tutkimiseen~\cite{browne}.
 
