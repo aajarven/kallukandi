@@ -169,20 +169,20 @@ Kombinatorinen peli on helppo mallintaa pelipuuna. Pelipuun juurisolmu kuvaa pel
 
 \subsection{Minimax ja heuristiikka}
 
-Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä.
+Perinteinen tapa toteuttaa pelitekoälyjä on \textit{minimax}-haku, jossa tekoäly olettaa kaikkien pelaajien pyrkivän maksimoimaan oman voittonsa toisten pelaajien pelatessa optimaalisesti~\cite{aima}. Tällainen tekoäly valitsisi siis mielummin varmasti tasapeliin johtavan siirron kuin sellaisen, jolla voi vastustajan valinnoista riippuen joko voittaa tai hävitä. Lopputulosta, joka seuraa kun molemmat pelaajat pelaavat minimax-strategian mukaan tietystä tilanteesta, kutsutaan tilanteen minimax-arvoksi.
 
-\textit{Minimax}-haun ongelmana on se, että vain puun lehtisolmujen arvo on tiedossa pelaajille~\cite{aima}. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa, tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti, jotta hakua voitaisiin jatkaa lehtisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa, on haku katkaistava ennen pelin lopputilanteisiin pääsemistä. Koska haku ei välttämättä pääse pelin lopputilanteisiin saakka, se tarvitsee keinon arvioida keskeneräisiä pelitilanteita lopputilanteiden tavoin.
+\textit{Minimax}-haun ongelmana on se, että vain puun lehtisolmujen arvo on tiedossa pelaajille~\cite{aima}. Yksinkertaisissa peleissä, kuten 3x3-ristinollassa, tämä ei ole vielä ongelma, mutta vaikkapa shakin pelipuu haarautuu aivan liian runsaasti, jotta hakua voitaisiin jatkaa lehtisolmuihin asti. Jotta seuraava siirto saataisiin valittua järkevässä ajassa, on haku katkaistava ennen pelin lopputilanteisiin pääsemistä. Koska haku ei välttämättä pääse pelin lopputilanteisiin saakka, se tarvitsee keinon arvioida keskeneräisten pelien minimax-arvoa.
 
-Keskeneräisen pelitilanteen perusteella voidaan laskea arvio sen edullisuudesta pelaajalle. Tällaisen arvion muodostavaa funktiota kutsutaan heuristiikaksi. Yksinkertainen heuristiikka shakkipeliin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja, joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
+Keskeneräisen pelitilanteen perusteella minimax-arvoa arvioivaa funktiota kutsutaan heuristiikaksi. Yksinkertainen heuristiikka shakkiin voi olla esimerkiksi nappuloiden lukumäärän laskeminen. Tätä heuristiikkaa käyttävä tekoäly osaisi valita tilanteita, joissa se saa materiaalietumatkaa, mutta edistyneemmät heuristiikat osaisivat painottaa tilanteita myös nappuloiden arvon ja sijainnin mukaan. Heuristiikkojen ongelmana on, että hyvän heuristiikan muodostaminen vaatii kehittäjältään paljon ymmärrystä pelistä. Joihinkin peleihin, esimerkiksi gohon, ei tunneta heuristiikkoja, joilla tekoäly olisi kilpailukykyinen vahvoja ihmispelaajia vastaan~\cite{browne}.
 
 
 \section{Monte Carlo -puuhaku}
 
-Monte Carlo -puuhaku (\textit{Monte Carlo Tree Search}, jatkossa MCTS)~\cite{browne} on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Kukin solmu hyödyntää kauttaan kulkeneita simulaatioita arvioidakseen odotusarvonsa. Perusajatuksena on, että simuloitujen pelien määrän kasvaessa odotusarvo tarkentuu vastaamaan niiden lähtötilanteen totuudenmukaista arvoa.
+Monte Carlo -puuhaku (\textit{Monte Carlo Tree Search}, jatkossa MCTS)~\cite{browne} on puuhakumenetelmä, jossa heuristiikan sijaan pelitilanteita arvioidaan simuloimalla niistä satunnaisotannalla pelejä lopputilanteeseen asti. Kukin solmu hyödyntää kauttaan kulkeneita simulaatioita muodostaakseen arvion todellisesta minimax-arvostaan. Perusajatuksena on, että simuloitujen pelien määrän kasvaessa odotusarvo tarkentuu vastaamaan niiden lähtötilanteen totuudenmukaista minimax-arvoa.
 
 MCTS-menetelmässä pelipuuta rakennetaan iteratiivisesti tarpeen mukaan. Haku aloitetaan pelipuulla, jossa on pelkästään pelin alkutilaa $s_0$ vastaava solmu $v_0$. Puuta laajennetaan etsimällä juuresta alkaen pelitilanteita, joita vastaavilla solmuilla on pelipuuhun liittymättömiä lapsia. Laajennettavan solmun valinta ei väistämättä tapahdu tasapuolisesti, vaan esimerkiksi haaroja, joista on saatu lupaavia tuloksia, voidaan laajentaa muita enemmän.
 
-Kun laajennettava solmu on valittu, puuhun liitetään sen uudeksi lapseksi jokin siitä seuraava pelitilanne. Tästä lapsesta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$. Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien pelitilanteiden kannattavuudesta pelin voittamisen kannalta~\cite{browne}.
+Kun laajennettava solmu on valittu, puuhun liitetään sen uudeksi lapseksi jokin siitä seuraava pelitilanne. Tästä lapsesta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa tunnetuista voittoehdoista tilanteesta seuraavan lopputuloksen $\Delta$. Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden jatkuessa tarkempi arvio niiden kuvaamien pelitilanteiden edullisuudesta.~\cite{browne}.
 
 \begin{figure}
 
@@ -239,7 +239,7 @@ UCB1:sta poiketen algoritmille annetaan tutkimusvakio (\textit{exploration term}
 \begin{equation}
 \text{UCT} = \overline{X}_j + C_p \sqrt{\frac{2 \ln n}{n_j}}
 \end{equation}
-arvon. Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Algoritmissa $s(v)$ on solmun $v$ kuvaama pelitilanne, $f(s(v), a)$ on tilanteesta $s(v)$ siirrolla $a$ saavutettava pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä ja $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$. Algoritmi palauttaa siirron, joka johtaa lapseen jolla on paras odotusarvo.
+arvon. Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{browne}. Algoritmissa $s(v)$ on solmun $v$ kuvaama pelitilanne, $f(s(v), a)$ on tilanteesta $s(v)$ siirrolla $a$ saavutettava pelitilanne, $Q(v)$ on $v$:n kautta saavutetun palkinnon kokonaisarvo, $N(v)$ on $v$:n kautta kulkeneiden simulaatioiden lukumäärä ja $\Delta(v, p)$ on pelaajan $p$ palkintoarvo solmussa $v$. Algoritmi palauttaa siirron lapseen jolla on paras odotusarvo korvaamalla tutkimusvakion $C_p$ arvolla $0$.
 
 \begin{center}
 \captionof{algorithm}{UCT-algoritmi}
@@ -308,9 +308,25 @@ arvon. Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{brown
 \rule{\textwidth}{1pt}
 \end{center}
 
+
+\section{Parannuksia menetelmään}
+
+\subsection{Simulaatiovaiheen tehostaminen}
+
+Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä ole kovin realistisia. Eräs tyypillinen parannus MCTS-algoritmiin on tehdä simulaatiovaiheesta älykkäämpi pelituntemusta (\textit{domain knowledge}) hyödyntäen.
+
+Silver ym.~\cite{silver} käsittelevät artikkelissaan simulaatiovaiheen tehostamista pelituntemusta hyödyntäen. Yksi mahdollinen malli simulaatiovaiheeseen tekoäly, joka valitsee vahvoja siirtoja joko koneoppimismenetelmien tai sille suoraan annetun heuristiikan avulla. Vahvemmat simulaatiot saattavat Silverin ym. mukaan kuitenkin jopa heikentää haun tehokkuutta.
+
+
+\subsection{Pelipuun karsinta}
+
+Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin perustein. Perinteisessä pelitekoälyssä yleinen mentelmä on $\alpha$-$\beta$ -karsinta, joka katkaisee hakupolut, kun niiden on osoitettu olevan korkeintaan yhtä hyviä kuin vaihtoehtoiset siirrot. MCTS voi hyödyntää karsintamenetelmiä samaan tapaan jättääkseen arvioimatta selvästi huonoja vaihtoehtoja, jolloin se voi kohdistaa laskenta-aikansa parempien tilanteiden tutkimiseen~\cite{browne}.
+
+
+
 \section{MCTS ja go}
 
-Go on kombinatorinen lautapeli, jota on pelattu Aasiassa jo yli kahdentuhannen vuoden ajan. Pelissä kaksi pelaajaa asettaa vuorotellen pelilaudan ruudukon risteyksiin kiviksi kutsuttuja pelinappuloita tarkoituksenaan vallata pelilaudan alueita ja poistaa vastustajan kiviä ympäröimällä ne omillaan. Pelin voittaja määräytyy pelaajien hallitseman alueen ja vastustajiltaan poistettujen kivien määrän perusteella.
+Go on kombinatorinen lautapeli, jota on pelattu Aasiassa jo yli kahdentuhannen vuoden ajan. Pelissä kaksi pelaajaa asettaa vuorotellen pelilaudan ruudukon risteyksiin kiviksi kutsuttuja pelinappuloita tarkoituksenaan vallata pelilaudan alueita ja vangita vastustajan kiviä ympäröimällä ne omillaan. Pelin voittaja määräytyy pelaajien hallitseman alueen ja vastustajiltaan poistettujen kivien määrän perusteella.
 
 Go-lautoja on erikokoisia, mutta virallisissa kilpailuissa käytetään yleensä $19 \times 19$ -risteyksen lautaa. Näin isolla laudalla pelit kestävät tyypillisesti satoja vuoroja, ja kullakin vuorolla mahdollisia siirtoja on keskimäärin noin 250~\cite{browne}. Pelipuu on siis kohtuuttoman suuri käsiteltäväksi perinteisellä minimax-haulla. Gohon on myös vaikea kehittää vahvoja heuristiikkoja, sillä yksittäisten kivien tai kiviryhmien arvo pelaajalle voi riippua paljon pelilaudan kokonaistilanteesta tai tulla ilmeiseksi vasta paljon myöhemmin pelissä.
 
@@ -326,17 +342,9 @@ AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerroin
 \end{equation}
 missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on solmun normaali UCT:n mukainen odotusarvo. Erityisen suosittu AMAF-muunnelma on RAVE (\textit{Rapid Action Value Estimation}) joka toimii kuten $\alpha$-AMAF, mutta pienentää $\alpha$:n arvoa solmun vierailukertojen mukaan. Tämä heuristiikka saa nopeasti karkeita arvioita, mutta vaihtaa hitaasti edetessään painotustaan kohti tarkempaa, tavallista UCT:tä~\cite{browne}.
 
-\section{Pelituntemuksen hyödyntäminen}
+Tilannetta, jossa kiviryhmä on vaarassa joutua vangiksi vastustajan seuraavalla siirrolla, kutsutaan \textit{atariksi}. Cazenave ym.~\cite{cazenaveatari} esittelevät heuristiikan, joka vaikuttaa lopulliseen solmun valintaan painottaen siirtoja jotka asettavat vastustajan kiviryhmän atariin tai vapauttaa omia kiviryhmiään atarista. Vastaavasti heuristiikka välttää siirtoja, jotka johtavat omien kiviryhmiensä joutumista atariin. Suurempien kiviryhmien atareja painotetaan enemmän kuin pienien.
 
-\subsection{Simulaatiovaiheen tehostaminen}
-
-Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä ole kovin realistisia. Eräs tyypillinen parannus MCTS-algoritmiin on tehdä simulaatiovaiheesta älykkäämpi pelattavan pelituntemusta (\textit{domain knowledge}) hyödyntäen.
-
-Silver ym. käsittelevät artikkelissaan~\cite{silver} pelituntemuksen yhdistämistä UCT-hakuun. Yksi mahdollinen malli simulaatiovaiheen tehostamiseen on liittää simulaatiovaiheeseen tekoäly, joka valitsee vahvoja siirtoja joko koneoppimismenetelmien tai sille suoraan annetun heuristiikan avulla. Silver ym. huomasivat kuitenkin, että liian hyvin yksittäisiä siirtoja tekevä simulaatio tuottaa huonompia tuloksia kuin vapaammin pelipuuta tutkiva simulaatio.
-
-\subsection{Pelipuun karsinta}
-
-Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin perustein. Perinteisessä pelitekoälyssä yleinen mentelmä on $\alpha$-$\beta$ -karsinta, joka katkaisee hakupolut, kun niiden on osoitettu olevan korkeintaan yhtä hyviä kuin vaihtoehtoiset siirrot. MCTS voi hyödyntää karsintamenetelmiä samaan tapaan jättääkseen arvioimatta selvästi huonoja vaihtoehtoja, jolloin se voi kohdistaa laskenta-aikansa parempien tilanteiden tutkimiseen~\cite{browne}.
+Toinen Cazenaven ym.~\cite{cazenave} käyttämä heuristiikka koskee kiviryhmien sisällä olevia vapaita risteyksiä, joita kutsutaan kiviryhmän silmiksi. Kiviryhmää, jolla on vähintään kaksi silmää, ei voi vangita, sillä vastustajan pelatessa silmään hänen oma kivensä tulee välittömästi vangituksi. Koska silmät ovat erittäin arvokkaita kiviryhmien turvaamisessa, Cazenaven ym. heuristiikka karsii pois siirrot jossa pelaaja poistaisi itseltään silmiä.
 
 
 \section{Rinnakkaistettu MCTS}
@@ -356,6 +364,7 @@ Puurinnakkaistamisen heikkouksiin kuuluu sen liiallinen keskittyminen samoihin h
 Juuririnnakkaistaminen on Cazenaven ym.~\cite{cazenave} kehittämä MCTS:n rinnakkaistusalgoritmi, joka suorittaa puurinnakkaistamisen tapaan täyden MCTS-algoritmin jokaisessa säikeessä. Juuririnnakkaistettu MCTS tuottaa pelimetsän antamalla jokaiselle säikeelle oman pelipuun, jolloin poistuu puurinnakkaistamisen tarve suojata muistia samanaikaiselta käytöltä. Kun laskenta-aika on käytetty loppuun, valitaan pelipuiden tuottamien tulosten mukaan pelattava siirto.
 
 Perinteinen ratkaisu pelattavan siirron valintaan pelimetsän perusteella on valita pelipuissa yhteenlasketusti eniten tutkittu solmu~\cite{browne}, mutta Soejima ym.~\cite{soejima} esittelevät vaihtoehtoisen strategian, jossa siirto valitaan enemmistöäänestyksellä. Enemmistöäänestys valitsee siirron, joka on useimman pelipuun eniten vierailtu solmu, eikä siten joudu tilanteisiin joissa metsän suosikiksi valitaan mielummin kaikkien toisiksi parhaana pitämä strategia kuin siirto, joka on enemmistön mielestä paras~\cite{soejima}.
+
 
 \section{MCTS ei-kombinatorisissa peleissä}
 
