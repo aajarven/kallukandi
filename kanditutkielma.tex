@@ -310,8 +310,6 @@ arvon. Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{brown
 
 \section{Parannuksia menetelmään}
 
-\subsection{Simulaatiovaiheen tehostaminen}
-
 Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä ole kovin realistisia. Eräs tyypillinen parannus MCTS-algoritmiin on tehdä simulaatiovaiheesta älykkäämpi pelituntemusta (\textit{domain knowledge}) hyödyntäen.
 
 Gelly ja Silver~\cite{gellysilver} käsittelevät artikkelissaan simulaatiovaiheen tehostamista käyttämällä simulaatiovaiheessa satunnaisten siirtojen sijasta tekoälyä, joka valitsee hyviä siirtoja joko koneoppimismenetelmien tai sille suoraan annetun heuristiikan avulla. Koska MCTS:n toimivuus perustuu simulaatiokertojen määrään, vahvojen simulaatioiden on pystyttävä hyvien siirtojen tekemisen lisäksi toimimaan nopeasti jotta otoskoko pysyy tarpeeksi suurena~\cite{browne}.
@@ -357,7 +355,7 @@ Toinen Cazenaven ym.~\cite{cazenave} käyttämä heuristiikka laskee kiviryhmien
 
 Gota pelataan turnauspeleissä usein pelikellon kanssa. Pelin voi hävitä normaalin lopputilanteen lisäksi käyttämällä vuoroihinsa liikaa aikaa, joten mietintäajan hajauttaminen oikein on erityisen tärkeää. Huang ym.~\cite{huang} tutkivat artikkelissaan gon ajanhallintaa MCTS:n yhteydessä tarkoituksenaan jakaa jäljellä oleva peliaika mahdollisimman tehokkaasti jäljellä olevaa peliä varten.
 
-Yksinkertaisin peliajan jakamisen malli on varata kullekin vuorolle aikaa samassa suhteessa jäljellä olevaan aikaan nähden~\cite{huang}. Menetelmä antaa ensimmäiselle vuorolle eniten aikaa, ja sen jälkeen kullekin vuorolle vähemmän jäljellä olevan ajan mukaan. Koska MCTS:n simulaatiovaihe suoritetaan nopeammin lähempänä loppupeliä, vuorojen lyheneminen ei ole suuri haitta. Alkupelin vuoroille annetaan kuitenkin enemmän aikaa kuin mitä niihin tarvittaisiin, ja tämän ajan voisi käyttää tehokkaammin pelin keskivaiheilla jolloin merkittäviä siirtoja tapahtuu enemmän.
+Yksinkertaisin peliajan jakamisen malli on varata kullekin vuorolle aikaa samassa suhteessa jäljellä olevaan aikaan nähden~\cite{huang}. Menetelmä antaa ensimmäiselle vuorolle eniten aikaa, ja sen jälkeen kullekin vuorolle vähemmän jäljellä olevan ajan mukaan. Koska MCTS:n simulaatiovaiheet suoritetaan nopeammin lähempänä loppupeliä, vuorojen lyheneminen ei ole suuri haitta. Alkupelin vuoroille annetaan kuitenkin enemmän aikaa kuin mitä niihin tarvittaisiin, ja tämän ajan voisi käyttää tehokkaammin pelin keskivaiheilla jolloin merkittäviä siirtoja tapahtuu enemmän.
 
 Huangin ym. vaihtoehtoinen ratkaisu määrittää vuorolle $n$ annetun mietintäajan $t_n$ lausekkeella
 \begin{equation}
@@ -365,7 +363,7 @@ t_n = \frac{t}{C + max(n_{max} - n, 0)}\,,
 \end{equation}
 missä $t$ on jäljellä oleva peliaika, ja $C$ sekä $n_{max}$ ovat vakioita~\cite{huang}. Tämä ratkaisu antaa vähemmän aikaa alkupelille mutta kasvattaa kunkin vuoron käyttämää ajan määrää kunnes saavutetaan vuoro $n_{max}$, mistä eteenpäin kunkin vuoron osuus peliajasta pysyy vakiona. Huangin ym. go-tekoälyn voittoprosentti parani keskipeliä painottavalla ajanhallinnalla seitsemän prosenttiyksikköä~\cite{huang}.
 
-Ajanhallintaa voi tehostaa käyttämällä vastustajan aikaa jne jne.
+On mahdollista, että UCT-haun päättyessä eniten tutkittu solmu on eri kuin solmu, jolla on korkein odotusarvo. Tällainen tilanne aiheutuu usein, kun eniten vieraillun solmun odotusarvo on laskussa tai haun loppuvaiheissa löydetään uusi, kannattavampi haara~\cite{huang}. Saadakseen selville mikä solmu on todella paras, Huangin ym. tekoäly jatkaa hakua antamalla sille ylimääräistä hakuaikaa puolet sen alkuperäisestä hakuajasta. Laskennan kohdennettu pidentäminen vähentää myöhempien siirtojen peliaikaa, mutta parantaa algoritmin pelikykyä~\cite{huang}.
 
 \section{Rinnakkaistettu MCTS}
 
@@ -394,15 +392,18 @@ Epätäydellisen informaation peli on peli, jossa kaikki pelaajat eivät tiedä 
 
 Determinisaatiolla tarkoitetaan satunnaisuutta tai epätäydellistä informaatiota sisältävän pelin analysointia käsittelemällä sitä deterministisen pelin tavoin~\cite{browne}. Determinisoitavasta pelitilanteesta luodaan mahdollisia pelitilanteita, joissa kaikki informaatio on pelaajille avointa ja satunnaistekijöiden arvot on kiinnitetty tunnetuiksi. Nämä pelitilanteet kuvaavat mahdollisia tilanteita eri satunnaistilojen ja piilotetun informaation arvoille. Niihin voidaan soveltaa kombinatorisen pelin MCTS-menetelmää, ja saatuja tuloksia voidaan käyttää toimintamallin valitsemiseen alkuperäisessä epädeterministisessä pelissä.
 
-Vastustajan strategian mallintaminen on erityisen tärkeää, kun pelin informaatio on epätäydellistä~\cite{browne}. Ainoastaan vastustajan tiedossa oleva informaatio voi vaikuttaa tämän tekemiin siirtoihin, jolloin vastustajan strategiasta voi muodostaa johtopäätöksiä vain tämän tiedossa olevasta informaatiosta. Esimerkiksi Ponsen ym.~\cite{ponsen} käyttivät pokerissa vastustajan mallinnusta Bayes-verkoilla päätelläkseen vastustajan kädessä olevien korttien todennäköisyysjakauman ja hyödynsi tuloksia determinisoitujen pelien luomisessa MCTS:ä varten.
+Vastustajan strategian mallintaminen on erityisen tärkeää, kun pelin informaatio on epätäydellistä~\cite{browne}. Ainoastaan vastustajan tiedossa oleva informaatio voi vaikuttaa tämän tekemiin siirtoihin, jolloin vastustajan strategiasta voi muodostaa johtopäätöksiä vain tämän tiedossa olevasta informaatiosta. Esimerkiksi Ponsen ym.~\cite{ponsen} käyttivät pokerissa vastustajan mallinnusta Bayes-relaatiomalleilla päätelläkseen vastustajan kädessä olevien korttien todennäköisyysjakauman ja hyödynsi tuloksia determinisoitujen pelien luomisessa MCTS:ä varten.
 
 \subsection{Videopelit}
 
-Reaaliaikaisessa pelissä pelitilanne voi edetä, vaikka pelaaja ei toimisi mitenkään~\cite{browne}. Tämä pakottaa pelaajan toimimaan erityisen nopeasti, sillä liian pitkään mietitty siirto voi muuttua harkinnan aikana huonoksi. Useimmat reaaliaikaiset pelit ovat videopelejä, joissa esiintyy lisäksi muitakin haasteita kuten satunnaisuutta, informaation epätäydellisyyttä ja erityisen suuria määriä mahdollisia pelitilanteita.
+Reaaliaikaisessa pelissä pelitilanne voi edetä, vaikka pelaaja ei toimisi mitenkään~\cite{browne}. Tämä pakottaa pelaajan toimimaan erityisen nopeasti, sillä liian pitkään mietitty siirto voi muuttua harkinnan aikana huonoksi tai laittomaksi. Useimmat reaaliaikaiset pelit ovat videopelejä, joissa esiintyy lisäksi muitakin haasteita kuten satunnaisuutta, informaation epätäydellisyyttä ja erityisen suuria määriä mahdollisia pelitilanteita.
 
-Samothrakis ym. tutkivat MCTS-pohjaisen menetelmän toimintaa \textit{Ms. Pac-Man} -pelissä~\cite{samothrakis}. Pelissä pelaaja kuljettaa hahmoa sokkelossa tarkoituksenansa kerätä kartalla olevat pisteet ja vältellä vihollisia. Vastapelaajina on neljä vihollista, joiden osittain satunnainen tekoäly pyrkii nappaamaan pelihahmon. Pelissä ei ole suoranaisia lopputiloja paitsi pelaajan hävitessä, joten MCTS:n simulaatiovaiheen täytyy rajata haku muilla tavoin. Samothrakis ym. ratkaisi ongelman rajaamalla simulaation maksimisyvyyden ja käyttämällä haun katkaisusolmun arviointiin yksinkertaista heuristiikkaa.
+Samothrakis ym.~\cite{samothrakis} tutkivat MCTS-pohjaisen menetelmän toimintaa \textit{Ms. Pac-Man} -pelissä. Pelissä pelaaja kuljettaa hahmoa sokkelossa tarkoituksenansa kerätä kartalla olevat pisteet ja vältellä vihollisia. Vastapelaajina on neljä vihollista, joiden osittain satunnainen tekoäly pyrkii nappaamaan pelihahmon. Pelissä ei ole suoranaisia lopputiloja paitsi pelaajan hävitessä, joten MCTS:n simulaatiovaiheen täytyy rajata haku muilla tavoin. Samothrakis ym. ratkaisi ongelman rajaamalla simulaation maksimisyvyyden ja käyttämällä haun katkaisusolmun arviointiin yksinkertaista heuristiikkaa.
 
-Toinen haaste \textit{Ms. Pac-Man} -pelissä on ajoituksen tarkkuus. Samothrakis ym. toteaa, että peli vaatii siirtojen tapahtuvan jopa 50-60 millisekunnin tarkkuudella, mikä asettaa tiukan rajan pelipuussa suoritettavan simulaation määrälle. Tulokset havaittiin kuitenkin erittäin hyviksi, ja MCTS-menetelmällä toimiva tekoäly keräsi testeissä evolutionaarisia ja geneettisiä algoritmeja sekä vahvistusoppimista hyödyntäviä menetelmiä kahta kertaluokkaa paremmat pisteet.
+Toinen haaste \textit{Ms. Pac-Man} -pelissä on ajoituksen tarkkuus. Samothrakis ym. toteaa, että peli vaatii siirtojen tapahtuvan jopa 50-60 millisekunnin tarkkuudella, mikä asettaa tiukan rajan pelipuussa suoritettavan simulaation määrälle. Tulokset havaittiin kuitenkin erittäin hyviksi, ja MCTS-menetelmällä toimiva tekoäly keräsi testeissä evolutionaarisia ja geneettisiä algoritmeja sekä vahvistusoppimista hyödyntäviä menetelmiä kahta kertaluokkaa paremmat pisteet~\cite{samothrakis}.
+
+\textit{Warcraft 2} on reaaliaikainen strategiapeli, jossa pelaajat rakentavat itselleen tukikohtia ja ohjaavat armeijoita tarkoituksenaan tuhota vastapelaajien joukot ja tukikohdat. Tekoälylle erityisiä haasteita pelissä ovat reaaliaikaisuus, epätäydellinen informaatio ja erittäin suuri mahdollisten siirtojen määrä. Balla ym.~\cite{balla} tutkivat sotilasyksiköiden koordinoimista tehokkaiksi hyökkäysjoukoiksi yksittäisiä taisteluita varten \textit{Warcraft 2}:ssa.
+
 
 \section{Yhteenveto}
 
