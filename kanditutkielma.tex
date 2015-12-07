@@ -310,11 +310,15 @@ arvon. Browne ym. esittelee UCT-haun algoritmin \ref{UCT} mukaisesti~\cite{brown
 
 \section{Parannuksia menetelmään}
 
-Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä ole kovin realistisia. Eräs tyypillinen parannus MCTS-algoritmiin on tehdä simulaatiovaiheesta älykkäämpi pelituntemusta (\textit{domain knowledge}) hyödyntäen.
+\subsection{Vahvat ja tasapainoiset simulaatiot}
 
-Gelly ja Silver~\cite{gellysilver} käsittelevät artikkelissaan simulaatiovaiheen tehostamista käyttämällä simulaatiovaiheessa satunnaisten siirtojen sijasta tekoälyä, joka valitsee hyviä siirtoja joko koneoppimismenetelmien tai sille suoraan annetun heuristiikan avulla. Koska MCTS:n toimivuus perustuu simulaatiokertojen määrään, vahvojen simulaatioiden on pystyttävä hyvien siirtojen tekemisen lisäksi toimimaan nopeasti jotta otoskoko pysyy tarpeeksi suurena~\cite{browne}.
+Tavallinen MCTS-toteutus käy simulaatiovaiheen läpi satunnaisilla siirroilla~\cite{browne}. Satunnaisten siirtojen mallin etuja ovat toteutuksen yksinkertaisuus ja mahdollisten tutkittavien tilanteiden monipuolisuus. Satunnaiset siirrot eivät kuitenkaan mallinna hyvin oikeiden pelaajien tekemiä ratkaisuja, joten simulaatiovaiheen tulokset eivät välttämättä kuvaa tilan todellista arvoa. Eroa tilan odotusarvon ja sen todellisen minimax-arvon välillä kutsutaan simulaation virheeksi (\textit{error})~\cite{silver}.
 
-Silver ym.~\cite{silver} käsittelevät vahvojen simulaatioiden tehokkuutta ja toteavat, että vahva simulaatio voi jopa heikentää MCTS:n tehokkuutta. Vahvat simulaatiot ovat helposti liian deterministisiä, mikä vääristää simulaatiovaiheen tuloksia toistuvilla, systemaattisilla virheillä. Silver ym. toteavat, että pelitilanteen odotusarvo kehittyy nopeammin tarkaksi simulaatioilla, jotka saavat tutkia pelipuuta vapaasti ja tehdä virheitä.
+Gelly ja Silver~\cite{gellysilver} käsittelevät artikkelissaan simulaatiomalleja, jotka pyrkivät minimoimaan kunkin suoritetun simulaation virheen hyödyntämällä heuristiikkaa tai koneoppimismenetelmiä, eli vahvoja simulaatioita. Koska MCTS:n toimivuus perustuu simulaatiokertojen määrään, vahvojen simulaatioiden on pystyttävä hyvien siirtojen tekemisen lisäksi toimimaan nopeasti jotta otoskoko pysyy tarpeeksi suurena~\cite{browne}.
+
+Silver ym.~\cite{silver} käsittelevät vahvojen simulaatioiden ominaisuuksia ja toteavat, että vahva simulaatio voi jopa heikentää MCTS:n tehokkuutta. Vahvat simulaatiot ovat helposti liian deterministisiä, jolloin pienet, systemaattiset virheet yksittäisissä simulaatioissa kasaantuvat usean simulaation aikana suureksi poikkeamaksi todellisesta minimax-arvosta.
+
+Silver ym. toteavat, että virheen minimoinnin sijasta on järkevää minimoida kokonaisvirheen odotusarvo~\cite{silver}. Tällaista mallia noudattavan simulaation annetaan synnyttää virhettä, mutta virheen suunta pyritään tasaamaan siten, että liian optimistisia virhearvioita syntyy samassa suhteessa kuin liian negatiivisia. Yltiöoptimistiset ja -pessimistiset virheet siis tasaavat toisensa pois, jolloin kokonaisarvio on lähellä todellista minmax-arvoa. Silver ym. kutsuvat kokonaisvirheen odotusarvoa minimoimaan pyrkivää simulaatiomallia tasapainoiseksi simulaatioksi.
 
 
 \subsection{Pelipuun karsinta}
