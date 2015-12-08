@@ -331,6 +331,15 @@ Pelipuun karsintamenetelmät voi jakaa kovaan ja pehmeään karsintaan~\cite{bro
 
 \section{MCTS ja go}
 
+\begin{figure}
+\centering
+\includegraphics[width = 0.8 \textwidth]{go_illustration.png}
+
+\caption{$19 \times 19$ Go-lauta ja kärjistetty pelitilanne. Vasemmalla ylhäällä valkea on ympäröinyt mustan kiviä tikapuiksi kutsuttuun muodostelmaan. Oikealla ylhäällä valkean kaksi kiveä ovat vangittavissa yhdellä siirrolla eli \textit{atarissa}. Oikealla keskellä valkea on muodostanut ryhmän, jolla on kaksi silmää, eli mustan yritys vangita ryhmä ympäröimällä ei voi onnistua. Todellisessa pelissä syntyvät muodostelmat ovat yleensä monimutkaisempia.}
+\end{figure}
+
+\subsection{Gon esittely}
+
 Go on kombinatorinen lautapeli, jota on pelattu Aasiassa jo yli kahdentuhannen vuoden ajan. Pelissä kaksi pelaajaa asettaa vuorotellen pelilaudan ruudukon risteyksiin kiviksi kutsuttuja pelinappuloita tarkoituksenaan vallata pelilaudan alueita ja vangita vastustajan kiviä ympäröimällä ne omillaan. Pelin voittaja määräytyy pelaajien hallitseman alueen ja vastustajiltaan poistettujen kivien määrän perusteella.
 
 Go-lautoja on erikokoisia, mutta virallisissa kilpailuissa käytetään yleensä $19 \times 19$ -risteyksen lautaa. Näin isolla laudalla pelit kestävät tyypillisesti satoja vuoroja, ja kullakin vuorolla mahdollisia siirtoja on keskimäärin noin 250~\cite{browne}. Pelipuu on siis kohtuuttoman suuri käsiteltäväksi perinteisellä minimax-haulla. Gohon on myös vaikea kehittää vahvoja heuristiikkoja, sillä yksittäisten kivien tai kiviryhmien arvo pelaajalle voi riippua paljon pelilaudan kokonaistilanteesta tai tulla ilmeiseksi vasta paljon myöhemmin pelissä.
@@ -349,11 +358,16 @@ AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerroin
 \end{equation}
 missä $A$ on solmun odotusarvo sen kautta simuloiduista peleistä ja $U$ on solmun normaali UCT:n mukainen odotusarvo. Erityisen suosittu AMAF-muunnelma on RAVE (\textit{Rapid Action Value Estimation}) joka toimii kuten $\alpha$-AMAF, mutta pienentää $\alpha$:n arvoa solmun vierailukertojen mukaan. Tämä heuristiikka saa nopeasti karkeita arvioita, mutta vaihtaa hitaasti edetessään painotustaan kohti tarkempaa, tavallista UCT:tä~\cite{browne}.
 
-\subsection{Kuvioihin pohjautuvat heuristiikat}
+\subsection{Pelitilanteeseen pohjautuvat heuristiikat}
 
 Tilannetta, jossa kiviryhmä on vaarassa joutua vangiksi vastustajan seuraavalla siirrolla, kutsutaan \textit{atariksi}. Cazenave ym.~\cite{cazenaveatari} esittelevät heuristiikan, joka vaikuttaa lopulliseen solmun valintaan painottaen siirtoja jotka asettavat vastustajan kiviryhmän atariin tai vapauttaa omia kiviryhmiään atarista. Vastaavasti heuristiikka välttää siirtoja, jotka johtavat omien kiviryhmiensä joutumista atariin. Suurempien kiviryhmien atareja painotetaan enemmän kuin pienien.
 
 Toinen Cazenaven ym.~\cite{cazenave} käyttämä heuristiikka laskee kiviryhmien sisällä olevia vapaita risteyksiä, joita kutsutaan kiviryhmän silmiksi. Kiviryhmää, jolla on vähintään kaksi silmää, ei voi vangita, sillä vastustajan pelatessa silmään hänen oma kivensä tulee välittömästi vangituksi. Koska silmät ovat erittäin arvokkaita kiviryhmien turvaamisessa, Cazenaven ym. heuristiikka karsii pois siirrot jossa pelaaja poistaisi itseltään silmiä.
+
+Wang ja Gelly~\cite{wanggelly} esittelevät simulaatiovaiheen heuristiikan, joka etsii laudalta tiettyjä $3\times 3$ risteyksen kuvioita etukäteen koottuun kuviokirjastoon pohjautuen. Kuviokirjaston avulla laudalta etsitään tiettyjä tilanteita, jotka on pelikokemuksen myötä havaittu erityisen tärkeiksi. Tällaisia tilanteita ovat mm. kahden yhdistymistä tavoittelevan vastustajan kiviryhmän katkaiseminen keskeltä.
+
+Kuten Cazenaven atari-heuristiikka, Wangin ja Gellyn menetelmä pyrkii ensisijaisesti pelastamaan omia kiviryhmiään atarista simulaatiovaiheessa. Jos tälle ei ole tarvetta, heuristiikka etsii viimeksi pelaamansa siirron läheltä mahdollisuuksia toteuttaa sille annettun kuviokirjaston määrittelemiä kuvioita~\cite{wanggelly}. Kuvioheuristiikka on yksi tapa tuottaa vahvoja pelejä simulaatiovaiheessa ja paransi Wangin ja Gellyn tekoälyn voittosuhdetta kolmellakymmenellä prosenttiyksiköllä~\cite{wanggelly}.
+
 
 \subsection{Ajanhallinta}
 
@@ -367,7 +381,7 @@ t_n = \frac{t}{C + max(n_{max} - n, 0)}\,,
 \end{equation}
 missä $t$ on jäljellä oleva peliaika, ja $C$ sekä $n_{max}$ ovat vakioita~\cite{huang}. Tämä ratkaisu antaa vähemmän aikaa alkupelille mutta kasvattaa kunkin vuoron käyttämää ajan määrää kunnes saavutetaan vuoro $n_{max}$, mistä eteenpäin kunkin vuoron osuus peliajasta pysyy vakiona. Huangin ym. go-tekoälyn voittoprosentti parani keskipeliä painottavalla ajanhallinnalla seitsemän prosenttiyksikköä~\cite{huang}.
 
-On mahdollista, että UCT-haun päättyessä eniten tutkittu solmu on eri kuin solmu, jolla on korkein odotusarvo. Tällainen tilanne aiheutuu usein, kun eniten vieraillun solmun odotusarvo on laskussa tai haun loppuvaiheissa löydetään uusi, kannattavampi haara~\cite{huang}. Saadakseen selville mikä solmu on todella paras, Huangin ym. tekoäly jatkaa hakua antamalla sille ylimääräistä hakuaikaa puolet sen alkuperäisestä hakuajasta. Laskennan kohdennettu pidentäminen vähentää myöhempien siirtojen peliaikaa, mutta parantaa algoritmin pelikykyä~\cite{huang}.
+On mahdollista, että UCT-haun päättyessä eniten tutkittu solmu on eri kuin solmu, jolla on korkein odotusarvo. Tällainen tilanne aiheutuu usein, kun eniten vieraillun solmun odotusarvo on laskussa tai haun loppuvaiheissa löydetään uusi, kannattavampi haara~\cite{huang}. Saadakseen selville mikä solmu on todella paras, Huangin ym. tekoäly jatkaa hakua antamalla sille ylimääräistä hakuaikaa puolet sen alkuperäisestä hakuajasta. Laskennan kohdennettu pidentäminen vähentää myöhempien siirtojen peliaikaa, mutta parantaa Huangin ym. tutkimuksen mukaan voittoprosenttia~\cite{huang}.
 
 \section{Rinnakkaistettu MCTS}
 
