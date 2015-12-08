@@ -404,6 +404,9 @@ Toinen haaste \textit{Ms. Pac-Man} -pelissä on ajoituksen tarkkuus. Samothrakis
 
 \textit{Warcraft 2} on reaaliaikainen strategiapeli, jossa pelaajat rakentavat itselleen tukikohtia ja ohjaavat armeijoita tarkoituksenaan tuhota vastapelaajien joukot ja tukikohdat. Tekoälylle erityisiä haasteita pelissä ovat reaaliaikaisuus, epätäydellinen informaatio ja erittäin suuri mahdollisten siirtojen määrä. Balla ym.~\cite{balla} tutkivat sotilasyksiköiden koordinoimista tehokkaiksi hyökkäysjoukoiksi yksittäisiä taisteluita varten \textit{Warcraft 2}:ssa.
 
+Balla ym. havaitsivat, että erilaisten tilanteiden monipuolisuus \textit{Warcraft 2} tekee vaikeaksi löytää UCT:n tutkimusvakiolle $C_p$ yleisesti hyvää arvoa~\cite{balla}. Ongelma ratkaistiin käyttämällä tutkimusvakiona tilan odotusarvoa. Koska jokaista sotilasyksikköä voi komentaa erikseen muista riippumatta ja armeijat voivat olla kymmenien yksiköiden suuruuksia, Balla ym. pienensi hakuavaruutta abstrahoimalla yksittäiset sotilasyksiköt joukoiksi, jotka vastaanottavat yhteisiä käskyjä ja pitävät yllä tietoa yksiköidensä kunnosta, sijainnista ja tilasta.
+
+Ballan ym. käyttämässä hakupuussa kukin solmu ylläpitää tietoa kaikkien pelaajien sotilasjoukoista, omien joukkojen tämänhetkisestä toiminnasta ja peliajasta~\cite{balla}. Kukin yksittäinen siirto pelipuussa antaa käskyn yhdelle omalle joukolle, joka ei vielä tee mitään. Käsky voi olla esimerkiksi yhdistää joukko toiseen, siirtää joukkoa tai saattaa joukko taistelemaan vihollissotilaiden kanssa.
 
 \section{Yhteenveto}
 
