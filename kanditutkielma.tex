@@ -109,7 +109,13 @@ Monte Carlo -puuhaun vahvuus pelitekoälynä kasvaa käytettävissä olevan lask
 % This is probably mostly relevant for computer scientists
 % uncomment the following; contents of \classification will be printed under the abstract with a title
 % "ACM Computing Classification System (CCS):"
-% \classification{}
+\classification{
+\\\textbf{Computing methodologies---Randomized search}
+\\\textit{Computing methodologies--Game tree search}
+\\Computing methodologies-Heuristic function construction
+\\Computing methodologies-Concurrent algorithms
+\\Theory of computation-Random search heuristics
+}
 
 % If the automatic page number counting is not working as desired in your case,
 % uncomment the following to manually set the number of pages displayed in the abstract page:
@@ -325,8 +331,11 @@ Silver ym. toteavat, että virheen minimoinnin sijasta on järkevää minimoida 
 
 Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin perustein. Perinteisessä pelitekoälyssä yleinen mentelmä on $\alpha$-$\beta$ -karsinta, joka katkaisee hakupolut, kun niiden on osoitettu olevan korkeintaan yhtä hyviä vuorossa olevalle pelaajalle kuin vaihtoehtoiset siirrot. MCTS voi hyödyntää karsintamenetelmiä samaan tapaan jättääkseen arvioimatta selvästi huonoja vaihtoehtoja, jolloin se voi kohdistaa laskenta-aikansa parempien tilanteiden tutkimiseen~\cite{browne}.
 
-Pelipuun karsintamenetelmät voi jakaa kovaan ja pehmeään karsintaan~\cite{browne}. Kovalla karsimisella tarkoitetaan solmujen pysyvää poistamista pelipuusta, jolloin haku ei koskaan etene niihin. Pehmeä karsiminen on tilapäistä, ja solmut voidaan liittää myöhemmin takaisin pelipuuhun. Pehmeä karsinta vähentää riskiä, että todellisuudessa hyviä siirtoja poistetaan pelipuusta ennenaikaisesti, mutta 
+Pelipuun karsintamenetelmät voi jakaa kovaan ja pehmeään karsintaan~\cite{browne}. Kovalla karsimisella tarkoitetaan solmujen pysyvää poistamista pelipuusta, jolloin haku ei koskaan etene niihin. Pehmeä karsiminen on tilapäistä, ja solmut voidaan liittää myöhemmin takaisin pelipuuhun. Pehmeä karsinta vähentää riskiä, että todellisuudessa hyviä siirtoja poistetaan pelipuusta ennenaikaisesti~\cite{browne}.
 
+Chaslot ym.~\cite{chaslotprune} esittelevät menetelmän, jossa solmuja karsitaan pehmeästi heuristiikkaan perustuen. Menetelmässä solmut, joiden vanhempia on simuloitu $p$ kertaa, arvioidaan peliin suunnitellulla heuristiikalla. Kaikki paitsi $k$ parhaan heuristisen arvon saanutta solmua karsitaan, jolloin niitä ei voida valita laajennettaviksi. Karsitut solmut palautetaan, kun niiden vanhempaa on simuloitu riittävän monta kertaa. Heuristiikan virhearvio ei estä hyviä solmuja löytymästä, jos laskenta-aikaa on tarpeeksi.~\cite{browne}.
+
+Huang ym.~\cite{huangprune} esittelevät kaksi karsintamenetelmää käytettäväksi UCT-haun kanssa. Absoluuttisessa karsinnassa pelipuun solmulta karsitaan kaikki sen lapset eniten simuloitua lasta lukuun ottamatta, kun on selvää etteivät muut lapset voi saavuttaa sitä simulaatiokertojen määrässä. Suhteellisessa karsinnassa pelipuun solmuille lasketaan tulevien simulaatiokertojen määrän yläraja, ja karsitaan solmut joiden yläraja on pienempi kuin jonkin niiden sisarussolmun simulaatiokertojen määrä. Toisin kuin Chaslotin ym. menetelmä, absoluuttinen ja suhteellinen karsinta eivät vaadi pelituntemuksen hyödyntämistä~\cite{huangprune}.
 
 
 \section{MCTS ja go}
