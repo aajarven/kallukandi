@@ -152,9 +152,9 @@ Monte Carlo -puuhaun vahvuus pelitekoälynä kasvaa käytettävissä olevan lask
 
 \subsection{Peliteoria ja pelipuu}
 
-Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista~\cite{browne}. Mahdollisten pelitilanteiden joukkoa merkitään $S$. Pelillä on alkutila $s_0 \in S$ ja joukko lopputiloja $S_T \subseteq S$. Mahdollisten siirtojen joukkoa merkitään $A$:lla, ja tilasiirtymäfunktio $f : S \times A \rightarrow S$ määrittää, mihin tilaan päädytään lähtötilasta milläkin siirrolla.
+Pelillä tarkoitetaan peliteoriassa ongelmaa, jossa yksi tai useampi toimija vaikuttavat päätöksillään lopputulokseen, jolla on jokin määritelty arvo kullekin pelaajista~\cite{browne}. Mahdollisten pelitilanteiden joukkoa merkitään $S$. Pelillä on alkutila $s_0 \in S$ ja joukko lopputiloja $S_T \subseteq S$. Mahdollisten siirtojen joukkoa merkitään $A$, ja tilasiirtymäfunktio $f : S \times A \rightarrow S$ määrittää, mihin tilaan päädytään lähtötilasta milläkin siirrolla.
 
-Pelin lopputuloksen edullisuus pelaajalle määritellään palkintofunktiolla $R : S \rightarrow \mathbb{R}$. Tässä tekstissä käytetään usein käytettyä palkintofunktiota, joka on arvoltaan $0$ pelitilanteissa jotka eivät ole lopputilanteita, ja lopputilanteille $1$ voittavista tilanteista, $0$ tasapeleistä ja $-1$ häviöistä.
+Pelin lopputuloksen edullisuus pelaajalle määritellään palkintofunktiolla $R : S \rightarrow \mathbb{R}$. Tässä tekstissä käytetään usein käytettyä palkintofunktiota, joka on arvoltaan $0$ pelitilanteissa jotka eivät ole lopputilanteita, ja lopputilanteille $1$ voittavissa tilanteissa, $0$ tasapeleissä ja $-1$ häviävissä tilanteissa.
 
 Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{browne}:
 
@@ -163,7 +163,7 @@ Kahden pelaajan peli on kombinatorinen, kun se täyttää seuraavat ehdot~\cite{
 	 \item Täydellinen informaatio, eli tarkka pelitilanne on jatkuvasti molempien pelaajien tiedossa.
 	 \item Determinismi, eli peliin ei sisälly satunnaistekijöitä.
 	 \item Vuorottaisuus, eli pelaaja voi toiminnallaan vaikuttaa pelitilanteeseen vain määrätyillä vuoroillaan.
-	 \item Diskreetti, eli peliä pelataan erillisissä vuoroissa reaaliaikaisuuden sijaan.
+	 \item Diskreettiys, eli peliä pelataan erillisissä vuoroissa reaaliaikaisuuden sijaan.
 \end{enumerate}
 
 Esimerkkejä kombinatorisista peleistä ovat shakki ja go. Kombinatoriset pelit ovat tekoälylle erinomainen tutkimus- ja soveltamisala, sillä niissä on usein yksinkertaiset säännöt, joiden päälle rakentuu kuitenkin edistynyttä strategiaa~\cite{browne}.
@@ -188,14 +188,14 @@ MCTS-menetelmässä pelipuuta rakennetaan iteratiivisesti tarpeen mukaan. Haku a
 Kun laajennettava solmu on valittu, puuhun liitetään sen uudeksi lapseksi jokin siitä seuraava pelitilanne. Tästä lapsesta suoritetaan pelin loppuun päättyvä simulaatio, jossa molempien pelaajien vuorot pelataan satunnaisilla siirroilla~\cite{browne}. Pelin lopettavaan tilanteeseen päädyttäessä simulaatio voi tarkistaa pelin voittoehdoista lopputuloksen $\Delta$. Saatu $\Delta$ palautetaan pelipuussa vastavirtaan juureen asti. Matkalla olevien solmujen odotusarvoja päivitetään uuden $\Delta$-arvon mukaan, jolloin solmuille muodostuu simulaatioiden määrän kasvaessa jatkuvasti tarkempi arvio solmun todellisesta minimax-arvosta.~\cite{browne}.
 
 \begin{figure}
-
 \includegraphics[width = \textwidth]{basicmcts.png}
 
 \caption{MCTS:n vaiheet. A: Laajennettavan solmun valinta pelipuusta. B:~Uuden solmun lisääminen ja simulaatio. C: Odotusarvojen päivittäminen vastavirtaan simulaation perusteella.}
+\label{fig:mcts}
 \end{figure}
 
 
-Algoritmissa \ref{MCTS} esitellään Brownen ym. yleistetty MCTS~\cite{browne}. Aliohjelmien \textsc{ValitseLapsi}, \textsc{Simuloi}, \textsc{Vastavirta} ja \textsc{ParasLapsi} toiminta on jätetty kuvaamatta, sillä ne vaihtelevat erilaisten MCTS-toteutusten välillä. Esimerkkitoteutus näille esitellään algoritmissa \ref{UCT}.
+Algoritmissa \ref{MCTS} ja kuvassa \ref{fig:mcts} esitellään Brownen ym. yleistetty MCTS~\cite{browne}. Aliohjelmien \textsc{ValitseLapsi}, \textsc{Simuloi}, \textsc{Vastavirta} ja \textsc{ParasLapsi} toiminta on jätetty kuvaamatta, sillä ne vaihtelevat erilaisten MCTS-toteutusten välillä. Esimerkkitoteutus näille esitellään algoritmissa \ref{UCT} sivulla \pageref{UCT}.
 
 \newpage
 \begin{samepage}
@@ -231,13 +231,13 @@ Dilemman ratkaisevan strategian esittelevät Auer ym. joiden luottamusylärajan 
 \begin{equation}
 \text{UCB1} = \overline{X}_j + \sqrt{\frac{2 \ln n}{n_j}}
 \end{equation}
-arvon, missä $X_j$ on vivun $j$ tuottamien palkintojen keskiarvo, $n_j$ on vivun $j$ pelikertojen määrä tähän mennessä ja $n$ on koko pelikoneen pelikertojen määrä. Tasapelit ratkaistaan toteutuksissa tyypillisesti satunnaisesti, ja kun $n_j = 0$ katsotaan että $\text{UCB1} = \infty$ eli kaikkia vipuja kokeillaan vähintään kerran ennen kuin yhtäkään pelataan toista kertaa~\cite{browne}.
+arvon, missä $\overline{X}_j$ on vivun $j$ tuottamien palkintojen keskiarvo, $n_j$ on vivun $j$ pelikertojen määrä tähän mennessä ja $n$ on koko pelikoneen pelikertojen määrä. Tasapelit ratkaistaan toteutuksissa tyypillisesti satunnaisesti, ja kun $n_j = 0$ katsotaan että $\text{UCB1} = \infty$ eli kaikkia vipuja kokeillaan vähintään kerran ennen kuin yhtäkään pelataan toista kertaa~\cite{browne}.
 
 Lai ja Robbins~\cite{lai} osoittivat, että useille palkintojakaumille ei ole olemassa monikätisen rosvon pelistrategiaa, jossa ainoastaan parasta vipua pelaavan strategian etumatka kasvaa hitaammin kuin $O(\ln n)$. UCB1:lla optimaalisen strategian etumatka kasvaa logaritmisesti, joten sitä voi pitää hyvänä ratkaisuna monikätisen rosvon ongelmaan. Se on myös yksinkertainen ja tehokas~\cite{browne}, joten se on mielekäs ratkaisu sovellettavaksi toisiin ongelmiin, kuten puun laajentamiseen MCTS:ssä.
 
 \subsection{Luottamusylärajat puuhaussa}
 
-Kocsisin ja Szepesvárin~\cite{kocsis} esittelemä puuhakujen luottamusyläraja -menetelmä (\textit{Upper Confidence Bounds for Trees} jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. UCT mallintaa pelipuuta laajentaessa solmun valinnan monikätisen rosvon ongelmana, ja käyttää pelistrategiana muunnelmaa UCB1:stä. Tällöin $X_j$ on solmun $j$ kautta suoritettujen simulaatioiden lopputulosten keskiarvo, $n_j$ solmun $j$ läpi suoritettujen simulaatioiden lukumäärä ja $n$ kaiken kaikkiaan suoritettujen simulaatioiden lukumäärä.
+Kocsisin ja Szepesvárin~\cite{kocsis} esittelemä puuhakujen luottamusyläraja -menetelmä (\textit{Upper Confidence Bounds for Trees} jatkossa UCT) on yleisimpiä algoritmeja MCTS:n toteutukseen. UCT mallintaa pelipuuta laajentaessa solmun valinnan monikätisen rosvon ongelmana, ja käyttää pelistrategiana muunnelmaa UCB1:stä. Tällöin $\overline{X}_j$ on solmun $j$ kautta suoritettujen simulaatioiden lopputulosten keskiarvo, $n_j$ solmun $j$ läpi suoritettujen simulaatioiden lukumäärä ja $n$ kaiken kaikkiaan suoritettujen simulaatioiden lukumäärä.
 
 UCB1:sta poiketen algoritmille annetaan tutkimusvakio (\textit{exploration term}) $C_p$ joka vaikuttaa algoritmin painotukseen uusien vaihtoehtojen tutkimuksen ja hyväksi tunnettujen hyödyntämisen välillä. Edetessään pelipuussa UCT pyrkii maksimoimaan lausekkeen
 \begin{equation}
@@ -325,7 +325,7 @@ Gelly ja Silver~\cite{gellysilver} käsittelevät artikkelissaan simulaatiomalle
 
 Silver ja Tesauro~\cite{silver} käsittelevät vahvojen simulaatioiden ominaisuuksia ja toteavat, että vahva simulaatio voi jopa heikentää MCTS:n tehokkuutta. Vahvat simulaatiot ovat helposti liian deterministisiä, jolloin pienet, systemaattiset virheet yksittäisissä simulaatioissa kasaantuvat usean simulaation aikana suureksi poikkeamaksi todellisesta minimax-arvosta.
 
-Silver ja Tesauro toteavat, että virheen minimoinnin sijasta on järkevää minimoida kokonaisvirheen odotusarvo~\cite{silver}. Tällaista mallia noudattavan simulaation annetaan synnyttää virhettä, mutta virheen suunta pyritään tasaamaan siten, että liian optimistisia virhearvioita syntyy samassa suhteessa kuin liian negatiivisia. Yltiöoptimistiset ja -pessimistiset virheet siis tasaavat toisensa pois, jolloin kokonaisarvio on lähellä todellista minmax-arvoa. Silver ja Tesauro kutsuvat kokonaisvirheen odotusarvoa minimoimaan pyrkivää simulaatiomallia tasapainoiseksi simulaatioksi.
+Silver ja Tesauro toteavat, että virheen minimoinnin sijasta on järkevää minimoida kokonaisvirheen odotusarvo~\cite{silver}. Tällaista mallia noudattavan simulaation annetaan synnyttää virhettä, mutta virheen suunta pyritään tasaamaan siten, että liian optimistisia virhearvioita syntyy samassa suhteessa kuin liian negatiivisia. Yltiöoptimistiset ja -pessimistiset virheet siis tasaavat toisensa pois, jolloin kokonaisarvio on lähellä todellista minimax-arvoa. Silver ja Tesauro kutsuvat kokonaisvirheen odotusarvoa minimoimaan pyrkivää simulaatiomallia tasapainoiseksi simulaatioksi.
 
 
 \subsection{Pelipuun karsinta}
@@ -334,7 +334,7 @@ Pelipuun läpikäyntiä voidaan nopeuttaa poistamalla sen haaroja määrätyin p
 
 Pelipuun karsintamenetelmät voi jakaa kovaan ja pehmeään karsintaan~\cite{browne}. Kovalla karsimisella tarkoitetaan solmujen pysyvää poistamista pelipuusta, jolloin haku ei koskaan etene niihin. Pehmeä karsiminen on tilapäistä, ja solmut voidaan liittää myöhemmin takaisin pelipuuhun. Pehmeä karsinta vähentää riskiä, että todellisuudessa hyviä siirtoja poistetaan pelipuusta ennenaikaisesti~\cite{browne}.
 
-Chaslot ym.~\cite{chaslotprune} esittelevät menetelmän, jossa solmuja karsitaan pehmeästi heuristiikkaan perustuen. Menetelmässä solmut, joiden vanhempia on simuloitu $p$ kertaa, arvioidaan peliin suunnitellulla heuristiikalla. Kaikki paitsi $k$ parhaan heuristisen arvon saanutta solmua karsitaan, jolloin niitä ei voida valita laajennettaviksi. Karsitut solmut palautetaan, kun niiden vanhempaa on simuloitu riittävän monta kertaa. Heuristiikan virhearvio ei estä hyviä solmuja löytymästä, jos laskenta-aikaa on tarpeeksi~\cite{browne}.
+Chaslot ym.~\cite{chaslotprune} esittelevät menetelmän, jossa solmuja karsitaan pehmeästi heuristiikkaan perustuen. Menetelmässä solmut, joiden vanhempia on simuloitu $p$ kertaa, arvioidaan peliin suunnitellulla heuristiikalla. Kaikki paitsi $k$ parhaan heuristisen arvon saanutta lapsisolmua karsitaan, jolloin niitä ei voida valita laajennettaviksi. Karsitut solmut palautetaan, kun niiden vanhempaa on simuloitu riittävän monta kertaa. Palautuksen takia heuristiikan mahdollinen virhearvio karsinnassa ei estä hyviä solmuja löytymästä, jos laskenta-aikaa on tarpeeksi~\cite{browne}.
 
 Huang ym.~\cite{huangprune} esittelevät kaksi karsintamenetelmää käytettäväksi UCT-haun kanssa. Absoluuttisessa karsinnassa pelipuun solmulta karsitaan kaikki sen lapset eniten simuloitua lasta lukuun ottamatta, kun on selvää etteivät muut lapset voi saavuttaa sitä simulaatiokertojen määrässä. Suhteellisessa karsinnassa pelipuun solmuille lasketaan tulevien simulaatiokertojen määrän yläraja, ja karsitaan solmut joiden yläraja on pienempi kuin jonkin niiden sisarussolmun simulaatiokertojen määrä. Toisin kuin Chaslotin ym. menetelmä, absoluuttinen ja suhteellinen karsinta eivät vaadi pelituntemuksen hyödyntämistä~\cite{huangprune}.
 
@@ -346,21 +346,22 @@ Huang ym.~\cite{huangprune} esittelevät kaksi karsintamenetelmää käytettäv�
 \includegraphics[width = 0.8 \textwidth]{go_illustration.png}
 
 \caption{$19 \times 19$ Go-lauta ja kärjistetty pelitilanne. Vasemmalla ylhäällä valkea on ympäröinyt mustan kiviä tikapuiksi kutsuttuun muodostelmaan. Oikealla ylhäällä valkean kaksi kiveä ovat vangittavissa yhdellä siirrolla eli \textit{atarissa}. Oikealla keskellä valkea on muodostanut ryhmän, jolla on kaksi silmää, eli mustan yritys vangita ryhmä ympäröimällä ei voi onnistua. Todellisessa pelissä syntyvät muodostelmat ovat yleensä monimutkaisempia.}
+\label{fig:go}
 \end{figure}
 
 \subsection{Gon esittely}
 
-Go on kombinatorinen lautapeli, jota on pelattu Aasiassa jo yli kahdentuhannen vuoden ajan. Pelissä kaksi pelaajaa asettaa vuorotellen pelilaudan ruudukon risteyksiin kiviksi kutsuttuja pelinappuloita tarkoituksenaan vallata pelilaudan alueita ja vangita vastustajan kiviä ympäröimällä ne omillaan. Pelin voittaja määräytyy pelaajien hallitseman alueen ja vastustajiltaan poistettujen kivien määrän perusteella.
+Go on kombinatorinen lautapeli, jota on pelattu Aasiassa jo yli kahdentuhannen vuoden ajan. Pelissä kaksi pelaajaa asettaa vuorotellen pelilaudan ruudukon risteyksiin kiviksi kutsuttuja pelinappuloita tarkoituksenaan vallata pelilaudan alueita ja vangita vastustajan kiviä ympäröimällä ne omillaan. Pelin voittaja määräytyy pelaajien hallitseman alueen ja vastustajiltaan poistettujen kivien määrän perusteella. Kuvassa \ref{fig:go} on esimerkki mahdollisesta pelitilanteesta.
 
 Go-lautoja on erikokoisia, mutta virallisissa kilpailuissa käytetään $19 \times 19$ -risteyksen lautaa. Näin isolla laudalla pelit kestävät tyypillisesti satoja vuoroja, ja kullakin vuorolla mahdollisia siirtoja on keskimäärin noin 250~\cite{browne}. Pelipuu on siis kohtuuttoman suuri käsiteltäväksi perinteisellä minimax-haulla. Gohon on myös vaikea kehittää vahvoja heuristiikkoja, sillä yksittäisten kivien tai kiviryhmien arvo pelaajalle voi riippua paljon pelilaudan kokonaistilanteesta tai tulla ilmeiseksi vasta paljon myöhemmin pelissä.
-\newpage
+
 MCTS on suosittu menetelmä go-tekoälyissä. Menetelmää sovellettiin peliin ensimmäistä kertaa vuonna 2006, ja ammattilaispelaajan pienellä $9 \times 9$ -laudalla voittava MCTS-tekoäly esiteltiin vuonna 2008~\cite{browne}. MCTS toimii gossa perinteisiä minimax-menetelmiä paremmin, sillä sen simulaatioon perustuva lähestymistapa ei tarvitse heuristiikkaa ja havaitsee siirtojen pitkän aikavälin vaikutuksia automaattisesti simulaatiovaiheessaan. Parhaita tuloksia saavuttavat tekoälypelaajat eivät kuitenkaan käytä pelkkää MCTS:ää, vaan yhdistävät menetelmään perinteisen tekoälyn piirteitä~\cite{browne}.
 
 \subsection{AMAF-heuristiikka}
 
 Parhaat gon tekoälypelaajat käyttävät siirtokohtaista odotusarvoa (\textit{All moves as first}, jatkossa AMAF)~\cite{browne}. AMAF-menetelmässä pelipuun solmut mallintavat siirtoja kokonaisten pelitilanteiden sijaan. Koska samat siirrot johtavat kombinatorisessa pelissä aina samaan tilanteeseen, tämä malli on yhtäpitävä tavallisen pelipuun kanssa. Tavallisen UCT:n tapaan AMAF valitsee osittaisesta pelipuusta laajennettavan solmun ja simuloi solmun kuvaamasta pelitilanteesta pelin lopputilaan asti saaden lopputulosta kuvaavan $\Delta$-arvon.
 
-Toisin kuin tavallinen UCT, AMAF päivittää solmujen odotusarvoja $\Delta$:n avulla vaikka ne pelattaisiin myöhemmin simulaatiossa~\cite{browne, helmbold}. AMAF-heuristiikka siis olettaa siirtojen hyödyn pelaajalle olevan osittain pelitilanteesta riippumattomia. Tämä oletus lisää siirtojen laskemia simulaatiokertoja suorittamatta todellisuudessa enempää simulaatioita, joten solmujen odotusarvo kehittyy nopeasti. Odotusarvo voi kuitenkin kehittyä harhaanjohtavaksi siirroille, joiden arvo riippuu paljon muusta pelitilanteesta~\cite{helmbold}.
+Toisin kuin tavallinen UCT, AMAF päivittää solmujen odotusarvoja $\Delta$:n avulla vaikka ne pelattaisiin myöhemmin simulaatiossa~\cite{helmbold}. AMAF-heuristiikka siis olettaa siirtojen hyödyn pelaajalle olevan osittain pelitilanteesta riippumattomia. Tämä oletus lisää siirtojen laskemia simulaatiokertoja suorittamatta todellisuudessa enempää simulaatioita, joten solmujen odotusarvo kehittyy nopeasti. Odotusarvo voi kuitenkin kehittyä harhaanjohtavaksi siirroille, joiden arvo riippuu paljon muusta pelitilanteesta~\cite{helmbold}.
 
 AMAF:stä on useita muunnelmia, kuten $\alpha$-AMAF joka käyttää painokerrointa $\alpha$ painottaakseen solmun odotusarvon kertymistä. Kukin solmu saa lopulliseksi odotusarvokseen
 \begin{equation}
@@ -393,11 +394,11 @@ missä $t$ on jäljellä oleva peliaika, ja $C$ sekä $n_{max}$ ovat vakioita~\c
 
 On mahdollista, että UCT-haun päättyessä eniten tutkittu solmu on eri kuin solmu, jolla on korkein odotusarvo. Tällainen tilanne aiheutuu usein, kun eniten vieraillun solmun odotusarvo on laskussa tai haun loppuvaiheissa löydetään uusi, kannattavampi haara~\cite{huang}. Saadakseen selville mikä solmu on todella paras, Huangin ym. tekoäly jatkaa hakua antamalla sille ylimääräistä hakuaikaa puolet sen alkuperäisestä hakuajasta. Laskennan kohdennettu pidentäminen vähentää myöhempien siirtojen peliaikaa, mutta parantaa Huangin ym. kokeiden mukaan voittoprosenttia seitsemällä prosenttiyksiköllä~\cite{huang}.
 
-Huang ym. esittelevät algoritmiin muutoksen, joka antaa UCT:n jatkaa hakua ylimääräisellä laskenta-ajalla jos juurisolmun odotusarvo on haun lopuksi jotain määriteltyä kynnysarvoa pienempi~\cite{huang}. Ajatuksena on saada UCT miettimään tavallista tarkemmin tilanteissa, joissa ajan loppumisen sijaan ollaan häviämässä huonon pelitilanteen takia. Lisäajan antaminen häviöllä olevalle algoritmille parantaa Huangin ym. tutkimuksissa algoritmin voittoprosenttia edelliseen heuristiikkaan yhdistettynä noin viidellä prosenttiyksiköllä~\cite{huang}.
+Huang ym. esittelevät algoritmiin muutoksen, joka antaa UCT:n jatkaa hakua ylimääräisellä laskenta-ajalla, jos juurisolmun odotusarvo on haun lopuksi jotain määriteltyä kynnysarvoa pienempi~\cite{huang}. Ajatuksena on saada UCT miettimään tavallista tarkemmin tilanteissa, joissa ajan loppumisen sijaan ollaan häviämässä huonon pelitilanteen takia. Lisäajan antaminen häviöllä olevalle algoritmille parantaa Huangin ym. tutkimuksissa algoritmin voittoprosenttia edelliseen heuristiikkaan yhdistettynä noin viidellä prosenttiyksiköllä~\cite{huang}.
 
 Pohdiskelulla (\textit{pondering}) tarkoitetaan pelitilanteen laskentaa vastustajan vuorolla~\cite{huang}. Menetelmän tarkoituksena on hyödyntää tehokkaasti vastustajan laskenta-aikaa. Yksinkertaisin MCTS:n kanssa käytetty pohdiskelumenetelmä on suorittaa MCTS-algoritmia vastustajan vuorolla kuin olisi tekoälyn vuoro. Kun vastustaja tekee siirtonsa, pohdiskellessa rakennetusta pelipuusta valitaan vastustajan siirron mukainen haara ja aloitetaan vuoron MCTS-haku käyttäen sitä pohjana.
 
-Pohdiskelun voi kohdistaa koko mahdollisten siirtojen joukon sijasta vain tietyihin siirtoihin, joita tekoäly arvioi vastustajan tekevän~\cite{huang}. Pohdiskeltavat siirrot valitaan omalla vuorolla suoritetun UCT:n perusteella, ja pohdiskellessa suoritettava UCT tutkii vain valittuja siirtoja. Huangin ym. havaitsivat vastustajan tekemän siirron kuuluvan pohdiskelualgoritmin valitsemiin siirtoihin vain n. 57\% kerroista, ja tulosten olevan voittoprosentin kannalta samaa tasoa kuin yksinkertaisemmalla pohdiskelualgoritmilla~\cite{huang}.
+Pohdiskelun voi kohdistaa koko mahdollisten siirtojen joukon sijasta vain tietyihin siirtoihin, joita tekoäly arvioi vastustajan tekevän~\cite{huang}. Pohdiskeltavat siirrot valitaan omalla vuorolla suoritetun MCTS:n perusteella, ja pohdiskellessa suoritettava MCTS tutkii vain valittuja siirtoja. Huangin ym. havaitsivat vastustajan tekemän siirron kuuluvan pohdiskelualgoritmin valitsemiin siirtoihin vain n. 57\% kerroista, ja tulosten olevan voittoprosentin kannalta samaa tasoa kuin yksinkertaisemmalla pohdiskelualgoritmilla~\cite{huang}.
 
 Koska myös vastapelaajan voi olettaa pohdiskelevan, kannattaa pohdiskelevan tekoälyn pyrkiä pelaamaan mahdollisimman lyhyitä vuoroja paitsi säästääkseen omaa aikaansa, myös evätäkseen vastustajalta ylimääräisen laskenta-ajan pohdiskeluun~\cite{huang}. Nopeilla siirroilla voi saavuttaa suurta hyötyä, sillä vähän pohdiskelemaan ehtivä vastustaja joutuu hyvään tulokseen päästäkseen laskemaan enemmän omalla vuorollaan, jolloin tekoäly saa enemmän pohdiskeluaikaa. 
 
@@ -440,11 +441,11 @@ Samothrakis ym.~\cite{samothrakis} tutkivat MCTS-pohjaisen menetelmän toimintaa
 
 Toinen haaste \textit{Ms. Pac-Man} -pelissä on ajoituksen tarkkuus. Samothrakis ym. toteaa, että peli vaatii siirtojen tapahtuvan jopa 50-60 millisekunnin tarkkuudella, mikä asettaa tiukan rajan pelipuussa suoritettavan simulaation määrälle. Tulokset havaittiin kuitenkin erittäin hyviksi, ja MCTS-menetelmällä toimiva tekoäly keräsi testeissä evolutionaarisia ja geneettisiä algoritmeja sekä vahvistusoppimista hyödyntäviä menetelmiä kahta kertaluokkaa paremmat pisteet~\cite{samothrakis}.
 
-\textit{Warcraft 2} on reaaliaikainen strategiapeli, jossa pelaajat rakentavat itselleen tukikohtia ja ohjaavat armeijoita tarkoituksenaan tuhota vastapelaajien joukot ja tukikohdat. Tekoälylle erityisiä haasteita pelissä ovat reaaliaikaisuus, epätäydellinen informaatio ja erittäin suuri mahdollisten siirtojen määrä. Balla ym.~\cite{balla} tutkivat sotilasyksiköiden koordinoimista tehokkaiksi hyökkäysjoukoiksi yksittäisiä taisteluita varten \textit{Warcraft 2}:ssa.
+\textit{Wargus} on reaaliaikainen strategiapeli, jossa pelaajat rakentavat itselleen tukikohtia ja ohjaavat armeijoita tarkoituksenaan tuhota vastapelaajien joukot ja tukikohdat. Tekoälylle erityisiä haasteita pelissä ovat reaaliaikaisuus, epätäydellinen informaatio ja erittäin suuri mahdollisten siirtojen määrä. Balla ym.~\cite{balla} tutkivat pelin sotilasyksiköiden koordinoimista tehokkaiksi hyökkäysjoukoiksi yksittäisiä taisteluita varten.
 
 Balla ym. havaitsivat, että erilaisten pelitilanteiden monipuolisuus tekee vaikeaksi löytää UCT:n tutkimusvakiolle $C_p$ yleisesti hyvää arvoa~\cite{balla}. Ongelma ratkaistiin käyttämällä tutkimusvakiona tilan odotusarvoa. Koska jokaista sotilasyksikköä voi komentaa erikseen muista riippumatta ja armeijat voivat olla kymmenien yksiköiden suuruuksia, hakuavaruutta pienennettiin abstrahoimalla yksittäiset sotilasyksiköt joukoiksi, jotka vastaanottavat yhteisiä käskyjä ja pitävät yllä tietoa yksiköidensä kunnosta, sijainnista ja tilasta.
 
-Ballan ym. käyttämässä hakupuussa kukin solmu ylläpitää tietoa kaikkien pelaajien sotilasjoukoista, omien joukkojen tämänhetkisestä toiminnasta ja peliajasta~\cite{balla}. Kukin yksittäinen siirto pelipuussa antaa käskyn yhdelle omalle joukolle, joka ei vielä tee mitään. Käsky voi olla esimerkiksi yhdistää joukko toiseen, siirtää joukkoa tai saattaa joukko taistelemaan vihollissotilaiden kanssa.
+Ballan ym. käyttämässä hakupuussa kukin solmu ylläpitää tietoa kaikkien pelaajien sotilasjoukoista, omien joukkojen tämänhetkisestä toiminnasta ja peliajasta~\cite{balla}. Kukin yksittäinen siirto pelipuussa antaa käskyn yhdelle omalle joukolle, joka ei vielä tee mitään. Käsky voi olla esimerkiksi yhdistää joukko toiseen, siirtää joukkoa tai saattaa joukko taistelemaan vihollissotilaiden kanssa. Lopputilanteina käytetään pelitilanteita, joissa vain yhdellä pelaajalla on elossa olevia sotilasyksiköitä. MCTS-pohjainen taistelutekoäly voitti Ballan ym. kokeissa kaikki toiset tekoälyt, ja käytti vähemmän aikaa kuin useimmat kilpailevat tekoälyt~\cite{balla}.
 
 \section{Yhteenveto}
 
